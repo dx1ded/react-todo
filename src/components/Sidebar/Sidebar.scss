@@ -1,0 +1,44 @@
+@import "../../styles/mixins";
+
+.sidebar {
+  padding: rem(20px) var(--container-horizontal-offset) rem(20px) 0;
+  border-right: 1px solid var(--color-secondary);
+
+  & .logo {
+    margin-bottom: rem(34px);
+  }
+
+  & .group {
+    margin-top: rem(40px);
+  }
+}
+
+.nav {
+  &__item {
+    display: flex;
+    align-items: center;
+    padding: rem(10px) rem(12px);
+    cursor: pointer;
+    background-color: var(--color-secondary);
+    border-radius: 5px;
+    transition: background-color 0.2s ease-in;
+
+    span {
+      margin-right: rem(12px);
+    }
+
+    &:hover {
+      background-color: var(--color-purple);
+    }
+
+    &:not(:last-child) {
+      margin-bottom: rem(12px);
+    }
+  }
+
+  &__link {
+    font-size: rem(14px);
+    font-weight: 500;
+    color: var(--color-light);
+  }
+}

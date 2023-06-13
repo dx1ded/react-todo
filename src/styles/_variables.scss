@@ -2,18 +2,25 @@
   // Colors
 
   --color-black: #000;
-  --color-light: #fff;
+  --color-white: #fff;
+  --color-light: #F2F2F2;
+  --color-primary: #262626;
+  --color-secondary: #333;
+  --color-blue: #4EA8DE;
+  --color-blue-dark: #1E6F9F;
+  --color-gray: #808080;
+  --color-purple: #5E60CE;
 
   // Offsets
 
   --container-horizontal-offset: #{em(15px)};
-  --design-mw: #{em(1600px)};
+  --design-mw: #{em(1280px)};
   --mw: calc(var(--design-mw) + var(--container-horizontal-offset) * 2);
   --grid-gap: #{em(20px)};
 
   // Fonts
 
-  --font-family: "Roboto", sans-serif;
+  --font-family: "Inter", sans-serif;
 
   // Shades
   // Z-indexes

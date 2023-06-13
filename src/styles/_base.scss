@@ -8,6 +8,8 @@
 
 body {
   font-family: var(--font-family);
+  color: var(--color-light);
+  background-color: var(--color-black);
 
   &.scroll-disabled {
     overflow: hidden;

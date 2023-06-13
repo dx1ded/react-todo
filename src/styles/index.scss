@@ -1,4 +1,20 @@
 @import "~normalize.css";
+@import "~material-symbols";
 @import "mixins";
 @import "variables";
 @import "base";
+
+#root {
+  display: flex;
+  align-items: center;
+  height: 100vh;
+}
+
+.app {
+  display: grid;
+  flex-basis: 100%;
+  grid-template-columns: rem(300px) 1fr;
+  height: rem(650px);
+  background-color: #262424;
+  border-radius: 4px;
+}
