@@ -53,3 +53,19 @@ body {
   white-space: nowrap;
   border: 0;
 }
+
+.title {
+  &--xl {
+    font-size: rem(38px);
+  }
+
+  &--md {
+    font-size: rem(24px);
+  }
+}
+
+.text {
+  &--sm {
+    font-size: rem(14px);
+  }
+}

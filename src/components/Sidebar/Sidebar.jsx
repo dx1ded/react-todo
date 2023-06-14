@@ -10,8 +10,10 @@ const Nav = ({ items }) => (
     <ul className="list-reset nav__list">
       {items.map((item, i) => (
         <li className="nav__item" key={i}>
-          <span className="material-symbols-outlined">{item.icon}</span>
-          <NavLink className="link-reset nav__link" to={item.path}>{item.name}</NavLink>
+          <NavLink className="link-reset nav__link" to={item.path}>
+            <span className="material-symbols-outlined">{item.icon}</span>
+            {item.name}
+          </NavLink>
         </li>
       ))}
     </ul>
@@ -25,7 +27,8 @@ export const Sidebar = () => {
       <Nav
         items={[
           { path: "/", name: "Dashboard", icon: "home" },
-          { path: "/profile", name: "Profile", icon: "person" }
+          { path: "/account", name: "Account", icon: "person" },
+          { path: "/about", name: "About", icon: "info" }
         ]}
       />
       <Group name="TO-DO">

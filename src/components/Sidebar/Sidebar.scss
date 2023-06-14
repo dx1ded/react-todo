@@ -14,10 +14,17 @@
 }
 
 .nav {
-  &__item {
+  &__item:not(:last-child) {
+    margin-bottom: rem(12px);
+  }
+
+  &__link {
     display: flex;
     align-items: center;
     padding: rem(10px) rem(12px);
+    font-size: rem(14px);
+    font-weight: 500;
+    color: var(--color-light);
     cursor: pointer;
     background-color: var(--color-secondary);
     border-radius: 5px;
@@ -30,15 +37,5 @@
     &:hover {
       background-color: var(--color-purple);
     }
-
-    &:not(:last-child) {
-      margin-bottom: rem(12px);
-    }
-  }
-
-  &__link {
-    font-size: rem(14px);
-    font-weight: 500;
-    color: var(--color-light);
   }
 }

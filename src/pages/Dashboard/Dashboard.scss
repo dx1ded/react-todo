@@ -1,0 +1,32 @@
+@import "../../styles/mixins";
+
+.dashboard {
+  padding: rem(30px);
+}
+
+.greeting {
+  margin-bottom: rem(60px);
+
+  &__name {
+    margin-bottom: rem(20px);
+  }
+}
+
+.info {
+  padding-bottom: rem(50px);
+
+  &__type {
+    margin-bottom: rem(20px);
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: rem(50px);
+  }
+
+  &:not(:last-child) {
+    margin-bottom: rem(50px);
+    border-bottom: 2px solid var(--color-light);
+  }
+}

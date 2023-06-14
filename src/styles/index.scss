@@ -16,5 +16,9 @@
   grid-template-columns: rem(300px) 1fr;
   height: rem(650px);
   background-color: #262424;
-  border-radius: 4px;
+  border-radius: 8px;
+
+  & > *:last-child {
+    overflow-y: auto;
+  }
 }

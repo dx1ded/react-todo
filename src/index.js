@@ -4,6 +4,7 @@ import {BrowserRouter, Routes, Route, Outlet} from "react-router-dom"
 import './styles/index.scss'
 
 import {Sidebar} from "./components/Sidebar/Sidebar"
+import {Dashboard} from "./pages/Dashboard/Dashboard"
 import {Auth} from "./pages/Auth/Auth"
 import {About} from "./pages/About/About"
 
@@ -21,6 +22,7 @@ ReactDOM.createRoot(document.getElementById('root'))
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Layout />}>
+              <Route index element={<Dashboard />} />
               <Route path="auth" element={<Auth />} />
               <Route path="about" element={<About />} />
             </Route>

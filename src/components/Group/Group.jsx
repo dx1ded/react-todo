@@ -2,7 +2,8 @@ import {useState} from "react"
 import "./Group.scss"
 
 export const Group = ({ name, children }) => {
-  const [isActive, setIsActive] = useState(false)
+  // TODO: set isActive to false by default
+  const [isActive, setIsActive] = useState(true)
 
   return (
     <div className={`group ${isActive ? "active" : ""}`}>
