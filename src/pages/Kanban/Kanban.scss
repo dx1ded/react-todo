@@ -1,0 +1,71 @@
+@import "../../styles/mixins";
+
+.kanban {
+  padding: rem(40px);
+
+  &__title {
+    margin-bottom: rem(40px);
+  }
+
+  &__container {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    padding: rem(12px) rem(16px);
+    margin-bottom: rem(28px);
+    background-color: var(--color-secondary);
+    border-radius: 6px;
+
+    & > span {
+      font-size: rem(22px);
+    }
+  }
+
+  &__name {
+    margin-left: rem(8px);
+    font-size: rem(14px);
+    text-transform: uppercase;
+  }
+
+  &__column {
+    flex: 1;
+
+    &:not(:last-child) {
+      margin-right: rem(20px);
+    }
+  }
+
+  &__add {
+    padding: rem(10px);
+    font-size: rem(14px);
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    background-color: var(--color-blue-dark);
+    border-radius: 6px;
+  }
+}
+
+.kanban-item {
+  padding: rem(20px) rem(16px);
+  cursor: grab;
+  background-color: var(--color-secondary);
+  border-radius: 6px;
+
+  &__title {
+    margin-bottom: rem(16px);
+  }
+
+  &__description {
+    font-size: rem(14px);
+    line-height: 1.3em;
+  }
+
+  &:not(:last-child) {
+    margin-bottom: rem(20px);
+  }
+}

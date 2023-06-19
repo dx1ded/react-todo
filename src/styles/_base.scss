@@ -59,6 +59,10 @@ body {
     font-size: rem(38px);
   }
 
+  &--lg {
+    font-size: rem(30px);
+  }
+
   &--md {
     font-size: rem(24px);
   }
@@ -67,5 +71,26 @@ body {
 .text {
   &--sm {
     font-size: rem(14px);
+  }
+}
+
+.btn {
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+
+  &--primary {
+    color: var(--color-light);
+    background-color: var(--color-blue);
+  }
+
+  &--secondary {
+    color: var(--color-light);
+    background-color: var(--color-purple);
+  }
+
+  &--danger {
+    color: var(--color-light);
+    background-color: red;
   }
 }

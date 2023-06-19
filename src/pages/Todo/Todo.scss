@@ -1,0 +1,127 @@
+@import "../../styles/mixins";
+
+.todo {
+  padding: rem(40px);
+
+  &__header {
+    margin-bottom: rem(50px);
+  }
+
+  &__name {
+    padding: rem(12px) rem(20px);
+    font-size: rem(20px);
+    font-weight: 500;
+    color: var(--color-light);
+    background-color: var(--color-secondary);
+    border: none;
+    border-radius: 8px;
+    outline: none
+  }
+
+  &__add {
+    display: flex;
+    margin-bottom: rem(60px);
+
+    input {
+      flex: 1;
+      padding: rem(16px);
+      margin-right: rem(8px);
+      color: var(--color-light);
+      background-color: var(--color-secondary);
+      border: none;
+      border-radius: 4px;
+      outline: none;
+
+      &::placeholder {
+        color: var(--color-gray);
+      }
+    }
+
+    button {
+      padding: rem(16px) rem(24px);
+      font-size: rem(14px);
+      font-weight: 700;
+      color: var(--color-white);
+      background-color: var(--color-blue-dark);
+    }
+  }
+
+  &__labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: rem(20px);
+  }
+
+  &__label {
+    font-size: rem(14px);
+
+    span {
+      padding: rem(2px) rem(8px);
+      margin-left: rem(8px);
+      font-size: rem(12px);
+      font-weight: 700;
+      color: #D9D9D9;
+      vertical-align: middle;
+      background-color: var(--color-secondary);
+      border-radius: 30px;
+    }
+  }
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: rem(18px);
+  cursor: grab;
+  background-color: var(--color-secondary);
+  border-radius: 8px;
+
+  &__left {
+    display: flex;
+    align-items: center;
+
+    span {
+      margin-right: rem(14px);
+      color: var(--color-blue);
+    }
+  }
+
+  &__right {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  &__name {
+    font-size: rem(14px);
+    font-weight: 400;
+  }
+
+  &__edit {
+    margin-right: rem(6px);
+  }
+
+  &:hover &__right {
+    opacity: 1;
+  }
+
+  &:not(:last-child) {
+    margin-bottom: rem(12px);
+  }
+
+  &--done {
+    .task__name {
+      text-decoration: line-through;
+    }
+
+    .task__left span {
+      color: var(--color-purple)
+    }
+  }
+
+  &__edit span,
+  &__delete span {
+    font-size: rem(22px);
+    color: var(--color-gray);
+  }
+}

@@ -1,0 +1,35 @@
+@import "../../styles/mixins";
+
+.about {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: rem(30px);
+  text-align: center;
+
+  &__text {
+    max-width: rem(500px);
+    margin: 0 auto;
+
+    p {
+      font-size: rem(15px);
+      line-height: 1.4em;
+      color: var(--color-light);
+
+      &:not(:last-child) {
+        margin-bottom: rem(10px);
+      }
+    }
+
+    a {
+      color: var(--color-blue);
+      text-decoration: none;
+    }
+  }
+
+  &__copyright {
+    font-size: rem(13px);
+    font-weight: 500;
+    color: var(--color-gray);
+  }
+}

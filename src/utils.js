@@ -23,3 +23,8 @@ export const getLastMonths = (amount) => {
       []
     )
 }
+
+export const isActivePath = (itemPath, currentPath) => {
+  return itemPath === currentPath
+    || itemPath === "/list" && currentPath.startsWith("/list")
+}

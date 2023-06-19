@@ -1,0 +1,19 @@
+{
+  "extends": "react-app",
+  "rules": {
+    "no-sequences": "off",
+    "import/prefer-default-export": "off",
+    "react/react-in-jsx-scope": "off",
+    "semi": "off",
+    "quotes": "off",
+    "additional-rule": "off",
+    "react/function-component-definition": "off",
+    "arrow-body-style": "off",
+    "jsx-a11y/img-redundant-alt": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.ts?(x)"]
+    }
+  ]
+}

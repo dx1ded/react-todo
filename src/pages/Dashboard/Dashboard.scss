@@ -1,7 +1,7 @@
 @import "../../styles/mixins";
 
 .dashboard {
-  padding: rem(30px);
+  padding: rem(40px);
 }
 
 .greeting {
@@ -10,13 +10,23 @@
   &__name {
     margin-bottom: rem(20px);
   }
+
+  &__text {
+    font-size: rem(14px);
+    font-weight: 500;
+    color: var(--color-blue);
+  }
 }
 
 .info {
-  padding-bottom: rem(50px);
+  padding-bottom: rem(60px);
 
   &__type {
-    margin-bottom: rem(20px);
+    padding: rem(10px) rem(16px);
+    margin-bottom: rem(26px);
+    color: var(--color-light);
+    background-color: var(--color-secondary);
+    border-radius: 4px;
   }
 
   &__row {
@@ -27,6 +37,6 @@
 
   &:not(:last-child) {
     margin-bottom: rem(50px);
-    border-bottom: 2px solid var(--color-light);
+    border-bottom: 2px solid var(--color-gray);
   }
 }

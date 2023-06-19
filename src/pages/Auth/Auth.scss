@@ -1,0 +1,68 @@
+@import "../../styles/mixins";
+
+.auth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: rem(40px);
+}
+
+.form {
+  flex-basis: rem(400px);
+  padding: rem(36px) rem(20px);
+  border: 0.5px solid var(--color-gray);
+  border-radius: 8px;
+
+  &__title {
+    margin-bottom: rem(36px);
+  }
+
+  &__group {
+    padding: 0;
+    margin-bottom: rem(24px);
+    border: none;
+  }
+
+  &__input {
+    width: 100%;
+    padding: rem(12px);
+    font-size: rem(14px);
+    font-weight: 500;
+    color: var(--color-light);
+    background-color: var(--color-secondary);
+    border: none;
+    border-radius: 6px;
+    outline: none;
+
+    &::placeholder {
+      color: inherit;
+    }
+
+    &:not(:last-child) {
+      margin-bottom: rem(10px);
+    }
+  }
+
+  &__submit {
+    width: 100%;
+    padding: rem(10px);
+    margin-bottom: rem(30px);
+    font-size: rem(14px);
+    font-weight: 500;
+    color: var(--color-light);
+    background-color: var(--color-purple);
+    border-radius: 6px;
+  }
+
+  &__action {
+    font-size: rem(14px);
+    font-weight: 500;
+    text-align: center;
+
+    button {
+      margin-left: rem(6px);
+      font-weight: 600;
+      color: var(--color-blue-dark);
+    }
+  }
+}
