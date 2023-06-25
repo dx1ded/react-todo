@@ -1,3 +1,4 @@
+import {useAuth} from "../../hooks/useAuth"
 import "./Todo.scss"
 
 const Task = ({ name, isDone }) => {
@@ -24,6 +25,8 @@ const Task = ({ name, isDone }) => {
 }
 
 export const Todo = () => {
+  useAuth()
+
   return (
     <section className="todo">
       <div className="todo__header">

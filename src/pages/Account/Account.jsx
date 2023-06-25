@@ -1,7 +1,9 @@
 import {useState} from "react"
+import {useAuth} from "../../hooks/useAuth"
 import "./Account.scss"
 
 const Action = ({ name, isInput, type }) => {
+  useAuth()
   const [isActive, setIsActive] = useState(false)
 
   return (

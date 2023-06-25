@@ -9,6 +9,7 @@ import {
   Legend
 } from "chart.js"
 import {Bar, Pie} from "react-chartjs-2"
+import {useAuth} from "../../hooks/useAuth"
 
 import {createOptions, createBarData, createPieData} from "./Chart.functions"
 import "./Dashboard.scss"
@@ -33,6 +34,8 @@ const Info = ({ type, children }) => {
 }
 
 export const Dashboard = () => {
+  useAuth()
+
   return (
     <section className="dashboard">
       <div className="greeting">

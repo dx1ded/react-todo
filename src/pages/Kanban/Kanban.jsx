@@ -1,3 +1,4 @@
+import {useAuth} from "../../hooks/useAuth"
 import "./Kanban.scss"
 
 const KanbanItem = ({ title, description }) => {
@@ -10,6 +11,8 @@ const KanbanItem = ({ title, description }) => {
 }
 
 export const Kanban = () => {
+  useAuth()
+
   return (
     <section className="kanban">
       <h2 className="title--lg kanban__title">Kanban</h2>

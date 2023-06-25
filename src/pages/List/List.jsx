@@ -1,4 +1,5 @@
 import {NavLink} from "react-router-dom"
+import {useAuth} from "../../hooks/useAuth"
 import "./List.scss"
 
 const ListItem = ({ id, name, dateModified }) => (
@@ -9,6 +10,8 @@ const ListItem = ({ id, name, dateModified }) => (
 )
 
 export const List = () => {
+  useAuth()
+
   return (
     <section className="list">
       <h2 className="title--lg list__title">List</h2>

@@ -1,41 +1,25 @@
+import './styles/index.scss'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import {BrowserRouter, Routes, Route, Outlet} from "react-router-dom"
-import './styles/index.scss'
+import {initializeApp} from "firebase/app"
+import {getAuth} from "firebase/auth"
+import {App} from "./App"
 
-import {Sidebar} from "./components/Sidebar/Sidebar"
-import {Dashboard} from "./pages/Dashboard/Dashboard"
-import {Auth} from "./pages/Auth/Auth"
-import {About} from "./pages/About/About"
-import {Account} from "./pages/Account/Account"
-import {Kanban} from "./pages/Kanban/Kanban"
-import {List} from "./pages/List/List"
-import {Todo} from "./pages/Todo/Todo"
+const app = initializeApp({
+  apiKey: "AIzaSyBFQnx80j5XA2_noPvqThgtvCce3unQkdI",
+  authDomain: "react-todo-eab1e.firebaseapp.com",
+  projectId: "react-todo-eab1e",
+  storageBucket: "react-todo-eab1e.appspot.com",
+  messagingSenderId: "159401738701",
+  appId: "1:159401738701:web:fb871c17c2cf404d40c484",
+  measurementId: "G-K9EZ8RD945"
+})
 
-const Layout = () => (
-  <>
-    <Sidebar />
-    <Outlet />
-  </>
-)
+const auth = await getAuth(app)
 
 ReactDOM.createRoot(document.getElementById('root'))
   .render(
     <React.StrictMode>
-      <div className="container app">
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="auth" element={<Auth />} />
-              <Route path="about" element={<About />} />
-              <Route path="account" element={<Account />} />
-              <Route path="kanban" element={<Kanban />} />
-              <Route path="list" element={<List />} />
-              <Route path="list/:id" element={<Todo />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </div>
+      <App auth={auth} />
     </React.StrictMode>
   )
