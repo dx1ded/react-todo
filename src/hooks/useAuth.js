@@ -1,10 +1,10 @@
 import {useContext, useEffect} from "react"
 import {useNavigate} from "react-router-dom"
 import {onAuthStateChanged} from "firebase/auth"
-import {FirebaseContext} from "../context/firebaseContext"
+import {AuthContext} from "../context/authContext"
 
 export const useAuth = () => {
-  const auth = useContext(FirebaseContext)
+  const auth = useContext(AuthContext)
   const navigate = useNavigate()
 
   useEffect(() => {

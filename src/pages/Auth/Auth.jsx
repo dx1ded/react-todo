@@ -1,7 +1,9 @@
 import {useState} from "react"
 import {useNavigate} from "react-router-dom"
 import {signInWithEmailAndPassword, createUserWithEmailAndPassword} from "firebase/auth"
+import {doc, setDoc} from "firebase/firestore/lite"
 import {useAuth} from "../../hooks/useAuth"
+import {useDB} from "../../hooks/useDB"
 import "./Auth.scss"
 
 const RegisterForm = ({ onAction, onSubmit }) => {
@@ -43,6 +45,7 @@ const LoginForm = ({ onAction, onSubmit }) => {
 
 export const Auth = () => {
   const auth = useAuth()
+  const db = useDB()
   const [isAccount, setIsAccount] = useState(false)
   const navigate = useNavigate()
 
@@ -61,6 +64,13 @@ export const Auth = () => {
         fData.get("email"),
         fData.get("password")
       )
+
+      if (event.target.dataset.auth === "register") {
+        await setDoc(
+          doc(db, "usernames", fData.get("email")),
+          {value: fData.get("username")}
+        )
+      }
 
       return navigate("/")
     } catch (e) {

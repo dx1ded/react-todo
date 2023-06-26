@@ -3,7 +3,6 @@ import {useAuth} from "../../hooks/useAuth"
 import "./Account.scss"
 
 const Action = ({ name, isInput, type }) => {
-  useAuth()
   const [isActive, setIsActive] = useState(false)
 
   return (
@@ -18,6 +17,8 @@ const Action = ({ name, isInput, type }) => {
 }
 
 export const Account = () => {
+  useAuth()
+
   return (
     <section className="account">
       <div className="photo">

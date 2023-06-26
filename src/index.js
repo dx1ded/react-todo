@@ -3,6 +3,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import {initializeApp} from "firebase/app"
 import {getAuth} from "firebase/auth"
+import {getFirestore} from "firebase/firestore/lite"
 import {App} from "./App"
 
 const app = initializeApp({
@@ -15,11 +16,12 @@ const app = initializeApp({
   measurementId: "G-K9EZ8RD945"
 })
 
-const auth = await getAuth(app)
+const auth = getAuth(app)
+const db = getFirestore(app)
 
 ReactDOM.createRoot(document.getElementById('root'))
   .render(
     <React.StrictMode>
-      <App auth={auth} />
+      <App auth={auth} db={db} />
     </React.StrictMode>
   )
