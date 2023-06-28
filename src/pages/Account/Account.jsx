@@ -1,35 +1,44 @@
-import {useState} from "react"
+import {useState, useEffect} from "react"
+import {onAuthStateChanged} from "firebase/auth"
+import {doc, getDoc} from "firebase/firestore/lite"
 import {useAuth} from "../../hooks/useAuth"
+import {useDB} from "../../hooks/useDB"
+import {isObjectEmpty} from "../../utils"
+import {Photo} from "./Photo"
+import {Action} from "./Action"
+import {Loader} from "../../components/Loader/Loader"
 import "./Account.scss"
 
-const Action = ({ name, isInput, type }) => {
-  const [isActive, setIsActive] = useState(false)
-
-  return (
-    <div className={`action ${isActive ? "active" : ""}`}>
-      <button
-        className={`btn btn-reset btn--${type} action__button`}
-        onClick={() => setIsActive(!isActive)}
-      >{name}</button>
-      {isInput && <input className="action__input" placeholder="Write something..." />}
-    </div>
-  )
-}
-
 export const Account = () => {
-  useAuth()
+  const auth = useAuth()
+  const db = useDB()
+  const [user, setUser] = useState({})
+
+  useEffect(() => {
+    const listen = onAuthStateChanged(auth, async (user) => {
+      if (!user) return
+
+      try {
+        const snapshot = await getDoc(doc(db, "users", user.email))
+        setUser(snapshot.data())
+      } catch (e) {
+        console.error(e)
+      }
+    })
+
+    return listen
+  }, [auth, db])
+
+  if (isObjectEmpty(user)) {
+    return <Loader />
+  }
 
   return (
     <section className="account">
-      <div className="photo">
-        <div className="photo__image">
-          <img src="https://i.stack.imgur.com/frlIf.png" alt="Profile picture" />
-        </div>
-        <button className="btn-reset photo__change">Change</button>
-      </div>
+      <Photo user={user} setUser={setUser} db={db} />
       <div className="user">
-        <h2 className="title--lg user__name">Volodymyr Doskochynskyi</h2>
-        <h5 className="text--sm user__nickname">@vovados1</h5>
+        <h2 className="title--lg user__name">{user.fullName}</h2>
+        <h5 className="text--sm user__nickname">@{user.username}</h5>
 
         <div className="account__actions">
           <Action

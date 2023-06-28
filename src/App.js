@@ -1,3 +1,4 @@
+import {Suspense} from "react"
 import {BrowserRouter, Routes, Route, Outlet} from "react-router-dom"
 import {AuthContext} from "./context/authContext"
 import {DatabaseContext} from "./context/databaseContext"

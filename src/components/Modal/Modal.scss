@@ -1,0 +1,55 @@
+@import "../../styles/mixins";
+
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 100000;
+  padding: rem(14px);
+  visibility: hidden;
+  background-color: rgb(0 0 0 / 60%);
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  transform: translate(-50%, -50%);
+
+  &__close {
+    --modal-thickness: 2px;
+
+    position: relative;
+    display: block;
+    width: rem(20px);
+    height: rem(20px);
+    margin-left: auto;
+    cursor: pointer;
+    transform: rotate(45deg);
+
+    span {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      display: block;
+      background-color: var(--color-light);
+      transform: translate(-50%, -50%);
+
+      &:nth-child(1) {
+        width: 100%;
+        height: var(--modal-thickness);
+      }
+
+      &:nth-child(2) {
+        width: var(--modal-thickness);
+        height: 100%;
+      }
+    }
+  }
+
+  &__body {
+    margin-top: rem(20px);
+  }
+  
+  &--active {
+    visibility: visible;
+    opacity: 1;
+  }
+}

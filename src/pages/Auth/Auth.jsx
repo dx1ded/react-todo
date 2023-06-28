@@ -12,6 +12,8 @@ const RegisterForm = ({ onAction, onSubmit }) => {
       <h4 className="title--md form__title">Sign up</h4>
       <fieldset className="form__group">
         <legend className="visually-hidden">Data to submit</legend>
+        <input type="text" name="firstName" className="form__input" placeholder="First Name" />
+        <input type="text" name="lastName" className="form__input" placeholder="Last Name" />
         <input type="text" name="username" className="form__input" placeholder="Username" />
         <input type="email" name="email" className="form__input" placeholder="Email" />
         <input type="password" name="password" className="form__input" placeholder="Password" />
@@ -67,8 +69,13 @@ export const Auth = () => {
 
       if (event.target.dataset.auth === "register") {
         await setDoc(
-          doc(db, "usernames", fData.get("email")),
-          {value: fData.get("username")}
+          doc(db, "users", fData.get("email")),
+          {
+            email: fData.get("email"),
+            username: fData.get("username"),
+            fullName: fData.get("firstName") + " " + fData.get("lastName"),
+            avatar: "https://i.stack.imgur.com/frlIf.png"
+          }
         )
       }
 
