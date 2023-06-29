@@ -82,10 +82,13 @@
 }
 
 .file {
+  margin-top: rem(12px);
+
   &__label {
     display: block;
-    padding: rem(10px) rem(50px);
+    padding: rem(8px);
     margin: 0 auto;
+    font-size: rem(13px);
     text-align: center;
     cursor: pointer;
     background-color: var(--color-purple);

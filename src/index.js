@@ -21,7 +21,7 @@ const db = getFirestore(app)
 
 ReactDOM.createRoot(document.getElementById('root'))
   .render(
-    <React.StrictMode>
+    // <React.StrictMode>
       <App auth={auth} db={db} />
-    </React.StrictMode>
+    // </React.StrictMode>
   )
