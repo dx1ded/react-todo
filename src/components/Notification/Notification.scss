@@ -1,11 +1,16 @@
 @import "../../styles/mixins";
 
-.notification {
+.notifications {
   position: fixed;
   top: rem(30px);
   right: rem(30px);
   z-index: 9999999;
+  width: rem(320px);
   max-width: rem(320px);
+}
+
+.notification {
+  position: relative;
   padding: rem(14px);
   background-color: var(--color-secondary);
   border: 1px solid var(--color-gray);
@@ -74,6 +79,10 @@
     height: rem(2px);
     background-color: var(--color-purple);
     transition: width 0.2s linear;
+  }
+
+  &:not(:last-child) {
+    margin-bottom: rem(14px);
   }
 
   &--open {

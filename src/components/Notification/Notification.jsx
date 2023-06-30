@@ -1,8 +1,7 @@
 import {useState, useEffect} from "react"
-import {createPortal} from "react-dom"
 import "./Notification.scss"
 
-const DURATION = 10000 // 10 sec
+const DURATION = 4000 // 10 sec
 
 export const Notification = ({
   title,
@@ -15,18 +14,15 @@ export const Notification = ({
   const [progress, setProgress] = useState(100)
 
   useEffect(() => {
-    const timeout = setTimeout(toggle, DURATION)
     const interval = setInterval(() => {
       setProgress((prevState) => prevState - 1)
+      if (progress === 0) toggle()
     }, DURATION / 100)
 
-    return () => {
-      clearTimeout(timeout)
-      clearInterval(interval)
-    }
-  }, [toggle])
+    return () => clearInterval(interval)
+  }, [toggle, progress])
 
-  return createPortal(
+  return (
     <div className={`notification ${hasTransitionedIn && isMounted ? "notification--open" : ""}`}>
       <div className="notification__header">
         <h2 className="notification__title">{title}</h2>
@@ -44,7 +40,6 @@ export const Notification = ({
         {children}
       </div>
       <div className="notification__progress" style={{width: `${progress}%`}}></div>
-    </div>,
-    document.body
+    </div>
   )
 }

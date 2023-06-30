@@ -1,7 +1,6 @@
 import {useState} from "react"
 import {doc, setDoc} from "firebase/firestore/lite"
-import {useMountTransition} from "../../hooks/useMountTransition"
-import {Notification} from "../../components/Notification/Notification"
+import {useNotification} from "../../components/Notification/useNotification"
 import {Loader} from "../../components/Loader/Loader"
 
 function convertBase64(file) {
@@ -15,11 +14,32 @@ function convertBase64(file) {
 }
 
 export const Photo = ({ user, setUser, db }) => {
-  // For notification
-  const [isMounted, setIsMounted] = useState(false)
-  const hasTransitionedIn = useMountTransition(isMounted, 500)
+  const [add, contextHolder] = useNotification()
   // Loader
   const [isLoading, setIsLoading] = useState(false)
+  let fn
+
+  const clickHandler = () => {
+    const remove = add({
+      title: "📸 Your request to change avatar",
+      text: "Upload your photo by choosing a file (max size is 1MB)",
+      children: isLoading ? <Loader /> : (
+          <div className="file">
+            <label className="file__label">
+              Choose File
+              <input
+                type="file"
+                className="file__input"
+                accept=".png,.jpeg,.jpg,.webp"
+                onChange={changePhoto}
+              />
+            </label>
+          </div>
+        )
+    })
+
+    fn = remove
+  }
 
   const changePhoto = async (event) => {
     setIsLoading(true)
@@ -35,7 +55,7 @@ export const Photo = ({ user, setUser, db }) => {
       )
 
       setIsLoading(false)
-      setIsMounted(false)
+      fn()
       setUser({...user, avatar: base64})
     } catch(e) {
       console.error(e)
@@ -44,33 +64,11 @@ export const Photo = ({ user, setUser, db }) => {
 
   return (
     <div className="photo">
-      {(isMounted || hasTransitionedIn) && (
-        <Notification
-          title="📸 Your request to change avatar"
-          text="Upload your photo by choosing a file (max size is 1MB)"
-          hasTransitionedIn={hasTransitionedIn}
-          isMounted={isMounted}
-          toggle={() => setIsMounted(!isMounted)}
-        >
-          {isLoading ? <Loader /> : (
-            <div className="file">
-              <label className="file__label">
-                Choose File
-                <input
-                  type="file"
-                  className="file__input"
-                  accept=".png,.jpeg,.jpg,.webp"
-                  onChange={changePhoto}
-                />
-              </label>
-            </div>
-          )}
-        </Notification>
-      )}
+      {contextHolder}
       <div className="photo__image">
         <img src={user.avatar} alt="Profile picture" />
       </div>
-      <button className="btn-reset photo__change" onClick={() => setIsMounted(true)}>
+      <button className="btn-reset photo__change" onClick={clickHandler}>
         Change
       </button>
     </div>
