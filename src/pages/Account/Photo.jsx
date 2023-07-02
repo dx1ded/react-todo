@@ -14,13 +14,12 @@ function convertBase64(file) {
 }
 
 export const Photo = ({ user, setUser, db }) => {
-  const [add, contextHolder] = useNotification()
-  // Loader
+  const [add, remove, contextHolder] = useNotification()
   const [isLoading, setIsLoading] = useState(false)
-  let fn
+  let id
 
   const clickHandler = () => {
-    const remove = add({
+    id = add({
       title: "📸 Your request to change avatar",
       text: "Upload your photo by choosing a file (max size is 1MB)",
       children: isLoading ? <Loader /> : (
@@ -37,8 +36,6 @@ export const Photo = ({ user, setUser, db }) => {
           </div>
         )
     })
-
-    fn = remove
   }
 
   const changePhoto = async (event) => {
@@ -55,7 +52,7 @@ export const Photo = ({ user, setUser, db }) => {
       )
 
       setIsLoading(false)
-      fn()
+      remove(id)
       setUser({...user, avatar: base64})
     } catch(e) {
       console.error(e)

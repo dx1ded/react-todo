@@ -1,7 +1,7 @@
 import {useState, useEffect} from "react"
 import "./Notification.scss"
 
-const DURATION = 4000 // 10 sec
+const DURATION = 10000 // 10 sec
 
 export const Notification = ({
   title,

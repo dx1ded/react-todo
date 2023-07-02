@@ -1,4 +1,4 @@
-import {useState, useMemo} from "react"
+import {useState, useMemo, useCallback} from "react"
 import {v4} from "uuid"
 import {useMountTransition} from "../../hooks/useMountTransition"
 import {Notification} from "./Notification"
@@ -22,41 +22,35 @@ const Layout = ({ element, toggle }) => {
 
 export const useNotification = () => {
   const [list, setList] = useState([])
+
+  const add = useCallback((params) => {
+    const id = v4()
+    const element = {...params, id, isMounted: true}
+    setList(list => [...list, element])
+    return id
+  }, [])
+
+  const remove = useCallback((elementId) => {
+      setList(list => list.map(elem => elem.id === elementId
+        ? {...elem, isMounted: false}
+        : elem
+      ))
+      setTimeout(() => {
+        setList(list => list.filter(elem => elem.id !== elementId));
+      }, 500)
+    }, [])
+
   const contextHolder = useMemo(() => (
     <div className="notifications">
       {list.map((element) => (
         <Layout
           element={element}
           key={element.id}
-          toggle={() => {
-            const copy = [...list]
-            const indexToDelete = copy.findIndex(({ id }) => id === element.id)
-            copy[indexToDelete].isMounted = false
-            setList(copy)
-            setTimeout(() => {
-              copy.splice(indexToDelete, 1)
-              setList(copy)
-            }, 500)
-          }}
+          toggle={() => remove(element.id)}
         />
       ))}
     </div>
-  ), [list])
+  ), [list, remove])
 
-  const add = (params) => {
-    const copy = [...list]
-    const uniqueId = v4()
-    copy.push({ ...params, isMounted: true, id: uniqueId })
-    setList(copy)
-
-    // returns remove function
-    return () => {
-      const copy = [...list]
-      const indexToDelete = copy.findIndex(({ id }) => id === uniqueId)
-      copy.splice(indexToDelete, 1)
-      setList(copy)
-    }
-  }
-
-  return [add, contextHolder]
+  return [add, remove, contextHolder]
 }
