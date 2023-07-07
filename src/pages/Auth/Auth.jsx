@@ -1,7 +1,7 @@
 import {useState} from "react"
 import {useNavigate} from "react-router-dom"
 import {signInWithEmailAndPassword, createUserWithEmailAndPassword} from "firebase/auth"
-import {doc, setDoc} from "firebase/firestore/lite"
+import {collection, addDoc} from "firebase/firestore/lite"
 import {useAuth} from "../../hooks/useAuth"
 import {useDB} from "../../hooks/useDB"
 import "./Auth.scss"
@@ -68,8 +68,8 @@ export const Auth = () => {
       )
 
       if (event.target.dataset.auth === "register") {
-        await setDoc(
-          doc(db, "users", fData.get("email")),
+        await addDoc(
+          collection(db, "users"),
           {
             email: fData.get("email"),
             username: fData.get("username"),

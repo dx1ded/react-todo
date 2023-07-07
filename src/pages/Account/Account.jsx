@@ -1,6 +1,6 @@
 import {useState, useEffect} from "react"
 import {onAuthStateChanged} from "firebase/auth"
-import {doc, getDoc} from "firebase/firestore/lite"
+import {getUserDoc} from "../../getUserDoc"
 import {useAuth} from "../../hooks/useAuth"
 import {useDB} from "../../hooks/useDB"
 import {isObjectEmpty} from "../../utils"
@@ -16,11 +16,12 @@ export const Account = () => {
 
   useEffect(() => {
     const listen = onAuthStateChanged(auth, async (user) => {
-      if (!user) return
+      if (!user?.email) return
 
       try {
-        const snapshot = await getDoc(doc(db, "users", user.email))
-        setUser(snapshot.data())
+        const doc = await getUserDoc(db, user.email)
+
+        setUser(doc.data())
       } catch (e) {
         console.error(e)
       }
@@ -42,16 +43,25 @@ export const Account = () => {
 
         <div className="account__actions">
           <Action
-            name="Change name"
+            name="email"
             isInput={true}
-            type="primary" />
+            type="primary"
+            auth={auth}>
+            Change e-mail
+          </Action>
           <Action
-            name="Change password"
+            name="password"
             isInput={true}
-            type="secondary" />
+            type="secondary"
+            auth={auth}>
+            Change password
+          </Action>
           <Action
-            name="Quit"
-            type="danger" />
+            name="quit"
+            type="danger"
+            auth={auth}>
+            Quit
+          </Action>
         </div>
       </div>
     </section>

@@ -1,4 +1,5 @@
 import {useState, useMemo, useCallback} from "react"
+import {createPortal} from "react-dom"
 import {v4} from "uuid"
 import {useMountTransition} from "../../hooks/useMountTransition"
 import {Notification} from "./Notification"
@@ -20,6 +21,18 @@ const Layout = ({ element, toggle }) => {
   )
 }
 
+function getContainer() {
+  const expectedContainer = document.querySelector(".notifications")
+  if (expectedContainer) return expectedContainer
+
+  const $root = document.querySelector("#root")
+  const container = document.createElement("div")
+  container.className = "notifications"
+
+  $root.append(container)
+  return container
+}
+
 export const useNotification = () => {
   const [list, setList] = useState([])
 
@@ -36,12 +49,12 @@ export const useNotification = () => {
         : elem
       ))
       setTimeout(() => {
-        setList(list => list.filter(elem => elem.id !== elementId));
+        setList(list => list.filter(elem => elem.id !== elementId))
       }, 500)
     }, [])
 
-  const contextHolder = useMemo(() => (
-    <div className="notifications">
+  const contextHolder = useMemo(() => createPortal(
+    <>
       {list.map((element) => (
         <Layout
           element={element}
@@ -49,8 +62,9 @@ export const useNotification = () => {
           toggle={() => remove(element.id)}
         />
       ))}
-    </div>
+    </>,
+    getContainer()
   ), [list, remove])
 
-  return [add, remove, contextHolder]
+  return [{add, remove}, contextHolder]
 }

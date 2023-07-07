@@ -29,6 +29,6 @@ export const isActivePath = (itemPath, currentPath) => {
     || (itemPath === "/list" && currentPath.startsWith("/list"))
 }
 
-export const isObjectEmpty = (objectName) => {
-  return Object.keys(objectName).length === 0
+export const isObjectEmpty = (object) => {
+  return Object.keys(object).length === 0
 }
