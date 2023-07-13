@@ -4,6 +4,8 @@ import {v4} from "uuid"
 import {useMountTransition} from "../../hooks/useMountTransition"
 import {Notification} from "./Notification"
 
+const DEFAULT_DELAY = 10000
+
 const Layout = ({ element, toggle }) => {
   const isMounted = element.isMounted
   const hasTransitionedIn = useMountTransition(isMounted, 500)
@@ -12,6 +14,7 @@ const Layout = ({ element, toggle }) => {
     <Notification
       title={element.title}
       text={element.text}
+      delay={element.delay || DEFAULT_DELAY}
       hasTransitionedIn={hasTransitionedIn}
       isMounted={isMounted}
       toggle={toggle}
@@ -36,6 +39,7 @@ function getContainer() {
 export const useNotification = () => {
   const [list, setList] = useState([])
 
+  // params -> { title: string, text?: string, delay?: number = 10000, children?: <ReactComponent> }
   const add = useCallback((params) => {
     const id = v4()
     const element = {...params, id, isMounted: true}

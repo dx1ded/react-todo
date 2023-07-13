@@ -74,7 +74,12 @@ export const Auth = () => {
             email: fData.get("email"),
             username: fData.get("username"),
             fullName: fData.get("firstName") + " " + fData.get("lastName"),
-            avatar: "https://i.stack.imgur.com/frlIf.png"
+            avatar: "https://i.stack.imgur.com/frlIf.png",
+            kanban: {
+              "To-Do": [],
+              "In progress": [],
+              "Done": []
+            }
           }
         )
       }

@@ -1,11 +1,10 @@
 import {useState, useEffect} from "react"
 import "./Notification.scss"
 
-const DURATION = 10000 // 10 sec
-
 export const Notification = ({
   title,
   text,
+  delay,
   hasTransitionedIn,
   isMounted,
   toggle,
@@ -17,10 +16,10 @@ export const Notification = ({
     const interval = setInterval(() => {
       setProgress((prevState) => prevState - 1)
       if (progress === 0) toggle()
-    }, DURATION / 100)
+    }, delay / 100)
 
     return () => clearInterval(interval)
-  }, [toggle, progress])
+  }, [toggle, progress, delay])
 
   return (
     <div className={`notification ${hasTransitionedIn && isMounted ? "notification--open" : ""}`}>
