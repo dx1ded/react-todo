@@ -39,10 +39,12 @@
     }
   }
 
-  &__add {
+  &__add button {
+    width: 100%;
     padding: rem(10px);
     font-size: rem(14px);
     font-weight: 700;
+    color: var(--color-light);
     text-align: center;
     cursor: pointer;
     background-color: var(--color-blue-dark);
