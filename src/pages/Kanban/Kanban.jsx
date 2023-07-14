@@ -1,36 +1,21 @@
 import {useState, useEffect} from "react"
 import {DragDropContext, Droppable, Draggable} from "react-beautiful-dnd"
 import ContentEditable from "react-contenteditable"
-import {useDebouncedCallback} from "use-debounce"
 import {onAuthStateChanged} from "firebase/auth"
-import {updateDoc} from "firebase/firestore/lite"
 import {getUserDoc} from "../../getUserDoc"
 import {isObjectEmpty} from "../../utils"
-import {useNotification} from "../../components/Notification/useNotification"
 import {useDB} from "../../hooks/useDB"
 import {useAuth} from "../../hooks/useAuth"
+import {useSaveDebounced} from "../../hooks/useSaveDebounced"
 import {Loader} from "../../components/Loader/Loader"
 import "./Kanban.scss"
-
-const DEBOUNCED_INTERVAL = 5000
 
 export const Kanban = () => {
   const auth = useAuth()
   const db = useDB()
-  const [api, contextHolder] = useNotification()
   const [doc, setDoc] = useState({})
   const [kanban, setKanban] = useState({})
-  const saveDataDebounced = useDebouncedCallback(
-    (kanban) => {
-      updateDoc(doc.ref, { kanban })
-        .then(() => api.add({
-          title: "👍 Saved",
-          text: "Your data has been saved successfully!",
-          delay: DEBOUNCED_INTERVAL
-        }))
-      },
-    DEBOUNCED_INTERVAL
-  )
+  const [saveData, contextHolder] = useSaveDebounced(doc.ref, "kanban")
 
   useEffect(() => {
     const listen = onAuthStateChanged(auth, async (user) => {
@@ -78,7 +63,7 @@ export const Kanban = () => {
     }
 
     setKanban(newState)
-    saveDataDebounced(newState)
+    saveData(newState)
   }
   const changeTask = (props, event, type) => {
     const [columnName, index] = props["data-rbd-draggable-id"].split("/")
@@ -93,7 +78,7 @@ export const Kanban = () => {
     }
 
     setKanban(newState)
-    saveDataDebounced(newState)
+    saveData(newState)
   }
   const deleteTask = (props) => {
     const [columnName, index] = props["data-rbd-draggable-id"].split("/")
@@ -104,7 +89,7 @@ export const Kanban = () => {
     }
 
     setKanban(newState)
-    saveDataDebounced(newState)
+    saveData(newState)
   }
   const handleDragDrop = (results) => {
     const { source, destination } = results
@@ -134,7 +119,7 @@ export const Kanban = () => {
     }
 
     setKanban(newState)
-    saveDataDebounced(newState)
+    saveData(newState)
   }
 
   if (isObjectEmpty(kanban)) {

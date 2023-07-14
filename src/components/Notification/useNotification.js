@@ -4,7 +4,7 @@ import {v4} from "uuid"
 import {useMountTransition} from "../../hooks/useMountTransition"
 import {Notification} from "./Notification"
 
-const DEFAULT_DELAY = 10000
+const DEFAULT_DURATION = 10000
 
 const Layout = ({ element, toggle }) => {
   const isMounted = element.isMounted
@@ -14,7 +14,7 @@ const Layout = ({ element, toggle }) => {
     <Notification
       title={element.title}
       text={element.text}
-      delay={element.delay || DEFAULT_DELAY}
+      duration={element.duration || DEFAULT_DURATION}
       hasTransitionedIn={hasTransitionedIn}
       isMounted={isMounted}
       toggle={toggle}
