@@ -82,8 +82,10 @@ export const List = () => {
           {list.map(item =>
             <ListItem
               id={item.id}
+              key={item.id}
               name={item.name}
-              dateModified={item.date_modified} />
+              dateModified={item.date_modified}
+            />
           )}
           <button className="btn btn-reset list__add" onClick={addList}>Add item</button>
         </div>
