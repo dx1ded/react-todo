@@ -1,57 +1,206 @@
+import {useState, useEffect, useRef} from "react"
+import {DragDropContext, Droppable, Draggable} from "react-beautiful-dnd"
+import {useParams, useNavigate} from "react-router-dom"
+import {v4} from "uuid"
+import {onAuthStateChanged} from "firebase/auth"
+import {updateDoc, deleteField} from "firebase/firestore/lite"
+import {getUserDoc} from "../../getUserDoc"
 import {useAuth} from "../../hooks/useAuth"
+import {useDB} from "../../hooks/useDB"
+import {useSaveDebounced} from "../../hooks/useSaveDebounced"
+import {Task} from "./Task"
+import {Loader} from "../../components/Loader/Loader"
 import "./Todo.scss"
 
-const Task = ({ name, isDone }) => {
-  return (
-    <li className={`task ${isDone ? "task--done" : ""}`}>
-      <div className="task__left">
-        <button className="btn btn-reset task__done" aria-label="Mark as done">
-          <span className="material-symbols-outlined">
-            {isDone ? "check_circle" : "radio_button_unchecked"}
-          </span>
-        </button>
-        <h5 className="task__name">{name}</h5>
-      </div>
-      <div className="task__right">
-        <button className="btn btn-reset task__edit" aria-label="Edit task">
-          <span className="material-symbols-outlined">edit_note</span>
-        </button>
-        <button className="btn btn-reset task__delete" aria-label="Delete task">
-          <span className="material-symbols-outlined">delete</span>
-        </button>
-      </div>
-    </li>
-  )
-}
-
 export const Todo = () => {
-  useAuth()
+  const auth = useAuth()
+  const db = useDB()
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [doc, setDoc] = useState({})
+  const [todo, setTodo] = useState({})
+  const [isLoading, setIsLoading] = useState(true)
+  const [saveData, contextHolder, api] = useSaveDebounced(doc.ref, `todos.${todo.id}`)
+  const inputRef = useRef(null)
+
+  useEffect(() => {
+    const listen = onAuthStateChanged(auth, async (user) => {
+      if (!user?.email) return
+
+      try {
+        const doc = await getUserDoc(db, user.email)
+        const todo = doc.data().todos[id]
+
+        if (!todo) return
+
+        setDoc(doc)
+        setTodo(todo)
+        setIsLoading(false)
+      } catch (e) {
+        console.error(e)
+      }
+    })
+
+    return listen
+  }, [auth, db, id])
+
+  if (isLoading) {
+    return <Loader />
+  }
+
+  const completedTasks = todo.tasks.reduce(
+    (acc, task) => task.done ? acc + 1 : acc, 0
+  )
+
+  const changeName = (event) => {
+    const newState = {
+      ...todo,
+      name: event.target.value,
+      date_modified: Date.now()
+    }
+
+    setTodo(newState)
+    saveData(newState)
+  }
+
+  const deleteTodo = () => {
+    const confirm = async () => {
+      await updateDoc(doc.ref, {
+        [`todos.${id}`]: deleteField()
+      })
+
+      navigate("/list")
+    }
+
+    api.add({
+      title: "🗑️ Do you want to delete?",
+      text: "If you really want to delete the todo-list, then confirm by clicking the button below",
+      children: (
+        <button
+          className="btn btn-reset todo__delete-confirm"
+          onClick={confirm}>
+          Delete
+        </button>
+      )
+    })
+  }
+
+  const addTask = () => {
+    if (!inputRef.current.value) {
+      return api.add({
+        title: "😶 Cannot be empty!",
+        text: "The name of the task cannot be empty. Please enter any letters!",
+        duration: 5000
+      })
+    }
+
+    const newState = {
+      ...todo,
+      date_modified: Date.now(),
+      tasks: [
+        {
+          id: v4(),
+          name: inputRef.current.value,
+          done: false
+        },
+        ...todo.tasks
+      ]
+    }
+
+    setTodo(newState)
+    saveData(newState)
+
+    inputRef.current.value = ""
+  }
+
+  const handleDragDrop = (results) => {
+    const { source, destination } = results
+
+    if (!destination || source.index === destination.index) return
+
+    const [
+      { index: sIndex },
+      { index: dIndex }
+    ] = [source, destination]
+
+    const filteredCol = todo.tasks.filter((_, i) => i !== sIndex)
+
+    const newState = {
+      ...todo,
+      date_modified: Date.now(),
+      tasks: [
+        ...filteredCol.slice(0, dIndex),
+        todo.tasks[sIndex],
+        ...filteredCol.slice(dIndex)
+      ]
+    }
+
+    setTodo(newState)
+    saveData(newState)
+  }
 
   return (
     <section className="todo">
+      {contextHolder}
       <div className="todo__header">
-        <input type="text" className="todo__name" defaultValue="To-Do Name" />
+        <input
+          type="text"
+          className="todo__name"
+          defaultValue={todo.name}
+          onChange={changeName}
+        />
+        <button className="btn btn-reset todo__delete" onClick={deleteTodo}>
+          Delete
+        </button>
       </div>
       <div className="todo__body">
         <div className="todo__add">
-          <input type="text" placeholder="Task name" />
-          <button className="btn btn-reset">Add</button>
+          <input
+            type="text"
+            placeholder="Task name"
+            onKeyDown={(e) => e.key === "Enter" && addTask()}
+            ref={inputRef}
+          />
+          <button
+            className="btn btn-reset"
+            onClick={addTask}>
+            Add
+          </button>
         </div>
         <div className="todo__labels">
           <h4 className="todo__label" style={{color: "var(--color-blue)"}}>
             Total amount
-            <span>4</span>
+            <span>{todo.tasks.length}</span>
           </h4>
           <h4 className="todo__label" style={{color: "var(--color-purple)"}}>
             Completed
-            <span>2 of 5</span>
+            <span>{completedTasks} of {todo.tasks.length}</span>
           </h4>
         </div>
-        <ul className="list-reset tasks">
-          <Task name="Do the washing up and keep on the pace" />
-          <Task name="Do the washing up and keep on the pace" isDone={true} />
-          <Task name="Do the washing up and keep on the pace" />
-        </ul>
+        <DragDropContext onDragEnd={handleDragDrop}>
+          <Droppable droppableId="tasks" type="group">
+            {(provided) => (
+              <ul className="list-reset tasks" {...provided.droppableProps} ref={provided.innerRef}>
+                {todo.tasks.map((task, i) =>
+                  <Draggable draggableId={`task/${task.id}`} key={task.id} index={i} isDragDisabled={task.done}>
+                    {(provided) => (
+                      <Task
+                        name={task.name}
+                        isDone={task.done}
+                        index={i}
+                        todo={todo}
+                        setTodo={setTodo}
+                        provided={provided}
+                        saveData={saveData}
+                      />
+                    )}
+                  </Draggable>
+                )}
+                {provided.placeholder}
+              </ul>
+            )}
+          </Droppable>
+        </DragDropContext>
       </div>
     </section>
   )

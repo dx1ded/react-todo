@@ -25,7 +25,7 @@ export const Photo = ({ user, setUser, db }) => {
       text: "Upload your photo by choosing a file (max size is 1MB)",
       children: isLoading ? <Loader /> : (
           <div className="file">
-            <label className="file__label">
+            <label className="btn btn-reset file__label">
               Choose File
               <input
                 type="file"

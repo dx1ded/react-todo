@@ -79,7 +79,8 @@ export const Auth = () => {
               "To-Do": [],
               "In progress": [],
               "Done": []
-            }
+            },
+            todos: {}
           }
         )
       }

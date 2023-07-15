@@ -4,6 +4,9 @@
   padding: rem(40px);
 
   &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: rem(50px);
   }
 
@@ -16,6 +19,22 @@
     border: none;
     border-radius: 8px;
     outline: none
+  }
+
+  &__delete {
+    padding: rem(12px) rem(16px);
+    font-size: rem(14px);
+    color: var(--color-light);
+    background-color: var(--color-blue-dark);
+  }
+
+  &__delete-confirm {
+    width: 100%;
+    padding: rem(8px);
+    margin-top: rem(12px);
+    font-size: rem(13px);
+    color: var(--color-light);
+    background-color: var(--color-purple);
   }
 
   &__add {
@@ -73,21 +92,27 @@
   align-items: center;
   justify-content: space-between;
   padding: rem(18px);
-  cursor: grab;
   background-color: var(--color-secondary);
   border-radius: 8px;
 
   &__left {
     display: flex;
     align-items: center;
+    margin-right: rem(10px);
+  }
 
-    span {
-      margin-right: rem(14px);
-      color: var(--color-blue);
-    }
+  &__drag {
+    margin-right: rem(10px);
+    color: var(--color-gray);
+  }
+
+  &__done {
+    margin-right: rem(14px);
+    color: var(--color-blue);
   }
 
   &__right {
+    display: flex;
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
   }
@@ -99,6 +124,10 @@
 
   &__edit {
     margin-right: rem(6px);
+  }
+
+  &__edit-done span {
+    color: var(--color-blue);
   }
 
   &:hover &__right {
@@ -114,8 +143,8 @@
       text-decoration: line-through;
     }
 
-    .task__left span {
-      color: var(--color-purple)
+    .task__done span {
+      color: var(--color-purple);
     }
   }
 

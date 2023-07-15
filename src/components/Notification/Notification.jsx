@@ -4,7 +4,7 @@ import "./Notification.scss"
 export const Notification = ({
   title,
   text,
-  delay,
+  duration,
   hasTransitionedIn,
   isMounted,
   toggle,
@@ -16,10 +16,10 @@ export const Notification = ({
     const interval = setInterval(() => {
       setProgress((prevState) => prevState - 1)
       if (progress === 0) toggle()
-    }, delay / 100)
+    }, duration / 100)
 
     return () => clearInterval(interval)
-  }, [toggle, progress, delay])
+  }, [toggle, progress, duration])
 
   return (
     <div className={`notification ${hasTransitionedIn && isMounted ? "notification--open" : ""}`}>
