@@ -14,9 +14,8 @@ export const Action = ({ name, isInput, type, auth, children }) => {
 
   const clickHandler = async (event) => {
     const dataName = event.target.dataset.name
-    if (dataName === "quit") {
-      return signOut(auth)
-    }
+
+    if (dataName === "quit") return signOut(auth)
     else if (!isActive) return setIsActive(!isActive)
 
     if (inputRef.current.validity.tooShort) {
@@ -52,9 +51,7 @@ export const Action = ({ name, isInput, type, auth, children }) => {
         await updateDoc(doc.ref, { email: inputValue })
       }
 
-      api.add({
-        title: `✅ Your ${name} has been updated!`
-      })
+      api.add({ title: `✅ Your ${name} has been updated!` })
 
       setIsActive(!isActive)
     } catch (e) {

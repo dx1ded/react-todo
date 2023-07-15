@@ -80,7 +80,7 @@ export const Auth = () => {
               "In progress": [],
               "Done": []
             },
-            list: []
+            todos: {}
           }
         )
       }

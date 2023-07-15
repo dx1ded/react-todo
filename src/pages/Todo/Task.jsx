@@ -1,11 +1,12 @@
 import {useState, useRef} from "react"
+import {flushSync} from "react-dom"
 
-export const Task = ({ name, isDone, index, list, setList, provided }) => {
+export const Task = ({ name, isDone, index, todo, setTodo, provided, saveData }) => {
   const [isDoneButton, setIsDoneButton] = useState(false)
   const nameRef = useRef(null)
 
   const toggleDone = () => {
-    const excludedList = list.tasks.filter((_, i) => i !== index)
+    const excludedList = todo.tasks.filter((_, i) => i !== index)
     let toInsertIndex = excludedList.findIndex((task) => task.done)
 
     if (!~toInsertIndex) {
@@ -15,40 +16,54 @@ export const Task = ({ name, isDone, index, list, setList, provided }) => {
     const tasks = [...excludedList]
 
     tasks.splice(isDone ? 0 : toInsertIndex, 0, {
-      ...list.tasks[index],
-      done: !list.tasks[index].done
+      ...todo.tasks[index],
+      done: !todo.tasks[index].done,
     })
 
-    const newState = { ...list, tasks }
+    const newState = {
+      ...todo,
+      date_modified: Date.now(),
+      tasks
+    }
 
-    setList(newState)
+    setTodo(newState)
+    saveData(newState)
   }
 
   const editTask = () => {
-    const input = nameRef.current
+    flushSync(() => setIsDoneButton(true))
 
-    input.focus()
-
-    setIsDoneButton(true)
+    nameRef.current.focus()
   }
 
   const changeTaskName = () => {
-    setList({
-      ...list,
-      tasks: list.tasks.map((task, i) => i === index
-        ? { ...list.tasks[i], name: nameRef.current.textContent }
+    if (name === nameRef.current.textContent) {
+      return setIsDoneButton(false)
+    }
+
+    const newState = {
+      ...todo,
+      date_modified: Date.now(),
+      tasks: todo.tasks.map((task, i) => i === index
+        ? { ...todo.tasks[i], name: nameRef.current.textContent }
         : task
       )
-    })
+    }
 
+    setTodo(newState)
+    saveData(newState)
     setIsDoneButton(false)
   }
 
   const deleteTask = () => {
-    setList({
-      ...list,
-      tasks: list.tasks.filter((_, i) => i !== index)
-    })
+    const newState = {
+      ...todo,
+      date_modified: Date.now(),
+      tasks: todo.tasks.filter((_, i) => i !== index)
+    }
+
+    setTodo(newState)
+    saveData(newState)
   }
 
   return (
