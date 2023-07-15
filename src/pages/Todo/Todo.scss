@@ -80,11 +80,16 @@
   &__left {
     display: flex;
     align-items: center;
+  }
 
-    span {
-      margin-right: rem(14px);
-      color: var(--color-blue);
-    }
+  &__drag {
+    margin-right: rem(10px);
+    color: var(--color-gray);
+  }
+
+  &__done {
+    margin-right: rem(14px);
+    color: var(--color-blue);
   }
 
   &__right {
@@ -101,6 +106,10 @@
     margin-right: rem(6px);
   }
 
+  &__edit-done span {
+    color: var(--color-blue);
+  }
+
   &:hover &__right {
     opacity: 1;
   }
@@ -114,8 +123,8 @@
       text-decoration: line-through;
     }
 
-    .task__left span {
-      color: var(--color-purple)
+    .task__done span {
+      color: var(--color-purple);
     }
   }
 

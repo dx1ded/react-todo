@@ -1,53 +1,15 @@
-import {useState, useEffect} from "react"
+import {useState, useEffect, useRef} from "react"
+import {DragDropContext, Droppable, Draggable} from "react-beautiful-dnd"
 import {useParams} from "react-router-dom"
+import {v4} from "uuid"
 import {onAuthStateChanged} from "firebase/auth"
 import {getUserDoc} from "../../getUserDoc"
 import {useAuth} from "../../hooks/useAuth"
 import {useDB} from "../../hooks/useDB"
 import {useSaveDebounced} from "../../hooks/useSaveDebounced"
+import {Task} from "./Task"
 import {Loader} from "../../components/Loader/Loader"
 import "./Todo.scss"
-
-const Task = ({ name, isDone, index, list, setList }) => {
-  const toggleDone = () => {
-    setList({
-      ...list,
-      tasks: list.tasks.map(
-        (task, i) => i === index
-          ? { ...list.tasks[index], done: !list.tasks[index].done }
-          : task
-      )
-    })
-  }
-
-  const deleteTask = () => {
-    setList({
-      ...list,
-      tasks: list.tasks.filter((_, i) => i !== index)
-    })
-  }
-
-  return (
-    <li className={`task ${isDone ? "task--done" : ""}`}>
-      <div className="task__left">
-        <button className="btn btn-reset task__done" aria-label="Mark as done" onClick={toggleDone}>
-          <span className="material-symbols-outlined">
-            {isDone ? "check_circle" : "radio_button_unchecked"}
-          </span>
-        </button>
-        <h5 className="task__name">{name}</h5>
-      </div>
-      <div className="task__right">
-        <button className="btn btn-reset task__edit" aria-label="Edit task">
-          <span className="material-symbols-outlined">edit_note</span>
-        </button>
-        <button className="btn btn-reset task__delete" aria-label="Delete task" onClick={deleteTask}>
-          <span className="material-symbols-outlined">delete</span>
-        </button>
-      </div>
-    </li>
-  )
-}
 
 export const Todo = () => {
   const auth = useAuth()
@@ -55,8 +17,8 @@ export const Todo = () => {
   const { id } = useParams()
   const [doc, setDoc] = useState({})
   const [list, setList] = useState({})
-  const [inputValue, setInputValue] = useState("")
   const [isLoading, setIsLoading] = useState(true)
+  const inputRef = useRef(null)
 
   useEffect(() => {
     const listen = onAuthStateChanged(auth, async (user) => {
@@ -82,9 +44,9 @@ export const Todo = () => {
     return <Loader />
   }
 
-  const completedTasks = list.tasks.reduce((acc, task) => {
-    return task.done ? acc + 1 : acc
-  }, 0)
+  const completedTasks = list.tasks.reduce(
+    (acc, task) => task.done ? acc + 1 : acc, 0
+  )
 
   const addTask = () => {
     setList({
@@ -92,11 +54,38 @@ export const Todo = () => {
       tasks: [
         ...list.tasks,
         {
-          name: inputValue,
+          id: v4(),
+          name: inputRef.current.value,
           done: false
         }
       ]
     })
+
+    inputRef.current.value = ""
+  }
+
+  const handleDragDrop = (results) => {
+    const { source, destination } = results
+
+    if (!destination || source.index === destination.index) return
+
+    const [
+      { index: sIndex },
+      { index: dIndex }
+    ] = [source, destination]
+
+    const filteredCol = list.tasks.filter((_, i) => i !== sIndex)
+
+    const newState = {
+      ...list,
+      tasks: [
+        ...filteredCol.slice(0, dIndex),
+        list.tasks[sIndex],
+        ...filteredCol.slice(dIndex)
+      ]
+    }
+
+    setList(newState)
   }
 
   return (
@@ -109,7 +98,8 @@ export const Todo = () => {
           <input
             type="text"
             placeholder="Task name"
-            onChange={(event) => setInputValue(event.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && addTask()}
+            ref={inputRef}
           />
           <button
             className="btn btn-reset"
@@ -127,18 +117,29 @@ export const Todo = () => {
             <span>{completedTasks} of {list.tasks.length}</span>
           </h4>
         </div>
-        <ul className="list-reset tasks">
-          {list.tasks.map((task, i) =>
-            <Task
-              key={i}
-              index={i}
-              name={task.name}
-              isDone={task.done}
-              list={list}
-              setList={setList}
-            />
-          )}
-        </ul>
+        <DragDropContext onDragEnd={handleDragDrop}>
+          <Droppable droppableId="list" type="group">
+            {(provided) => (
+              <ul className="list-reset tasks" {...provided.droppableProps} ref={provided.innerRef}>
+                {list.tasks.map((task, i) =>
+                  <Draggable draggableId={`list/${task.id}`} key={task.id} index={i} isDragDisabled={task.done}>
+                    {(provided) => (
+                      <Task
+                        index={i}
+                        name={task.name}
+                        isDone={task.done}
+                        list={list}
+                        setList={setList}
+                        provided={provided}
+                      />
+                    )}
+                  </Draggable>
+                )}
+                {provided.placeholder}
+              </ul>
+            )}
+          </Droppable>
+        </DragDropContext>
       </div>
     </section>
   )

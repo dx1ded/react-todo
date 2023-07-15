@@ -81,15 +81,6 @@ export const Auth = () => {
               "Done": []
             },
             list: []
-            // list: [
-            //   {
-            //     name: "Daily Routine",
-            //     date_modified: Date.now(),
-            //     tasks: [
-            //       { name: "Task Name", done: true | false }
-            //     ]
-            //   }
-            // ]
           }
         )
       }
