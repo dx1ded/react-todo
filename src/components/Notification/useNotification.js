@@ -61,8 +61,8 @@ export const useNotification = () => {
     <>
       {list.map((element) => (
         <Layout
-          element={element}
           key={element.id}
+          element={element}
           toggle={() => remove(element.id)}
         />
       ))}

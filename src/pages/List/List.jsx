@@ -2,10 +2,10 @@ import {useState, useEffect} from "react"
 import {NavLink} from "react-router-dom"
 import {v4} from "uuid"
 import {onAuthStateChanged} from "firebase/auth"
+import {updateDoc} from "firebase/firestore/lite"
 import {getUserDoc} from "../../getUserDoc"
 import {useAuth} from "../../hooks/useAuth"
 import {useDB} from "../../hooks/useDB"
-import {useSaveDebounced} from "../../hooks/useSaveDebounced"
 import {Loader} from "../../components/Loader/Loader"
 import "./List.scss"
 
@@ -30,7 +30,7 @@ export const List = () => {
   const [doc, setDoc] = useState({})
   const [list, setList] = useState({})
   const [isLoading, setIsLoading] = useState(true)
-  const [saveData, contextHolder] = useSaveDebounced(doc.ref, "todos")
+  // const [saveData, contextHolder] = useSaveDebounced(doc.ref, "todos")
 
   useEffect(() => {
     const listen = onAuthStateChanged(auth, async (user) => {
@@ -50,7 +50,7 @@ export const List = () => {
     return listen
   }, [auth, db])
 
-  const addList = () => {
+  const addList = async () => {
     const id = v4()
 
     const newState = {
@@ -64,7 +64,7 @@ export const List = () => {
     }
 
     setList(newState)
-    saveData(newState)
+    await updateDoc(doc.ref, { "todos": newState })
   }
 
   if (isLoading) {
@@ -73,7 +73,6 @@ export const List = () => {
 
   return (
     <section className="list">
-      {contextHolder}
       <h2 className="title--lg list__title">List</h2>
       <div className="list__container">
         <div className="list__labels">

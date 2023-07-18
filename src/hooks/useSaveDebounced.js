@@ -2,7 +2,7 @@ import {useDebouncedCallback} from "use-debounce"
 import {updateDoc} from "firebase/firestore/lite"
 import {useNotification} from "../components/Notification/useNotification"
 
-const DEBOUNCED_INTERVAL = 3000
+const DEBOUNCED_INTERVAL = 1500
 
 export const useSaveDebounced = (doc, fieldName) => {
   const [api, contextHolder] = useNotification()

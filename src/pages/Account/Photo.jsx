@@ -23,6 +23,7 @@ export const Photo = ({ user, setUser, db }) => {
     id = api.add({
       title: "📸 Your request to change avatar",
       text: "Upload your photo by choosing a file (max size is 1MB)",
+      duration: 15000,
       children: isLoading ? <Loader /> : (
           <div className="file">
             <label className="btn btn-reset file__label">
@@ -40,8 +41,18 @@ export const Photo = ({ user, setUser, db }) => {
   }
 
   const changePhoto = async (event) => {
-    setIsLoading(true)
     const file = event.target.files[0]
+    const sizeInMb = file.size / 1024 / 1024
+
+    if (sizeInMb >= 1) {
+      return api.add({
+        title: "⚖️ File cannot exceed 1 MB",
+        text: "Please choose another file which size is less than 1 MB!",
+        duration: 4000
+      })
+    }
+
+    setIsLoading(true)
 
     try {
       const base64 = await convertBase64(file)

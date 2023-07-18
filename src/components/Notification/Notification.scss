@@ -16,8 +16,10 @@
   border: 1px solid var(--color-gray);
   border-radius: 10px 10px 0 0;
   box-shadow: 0 0 5px rgb(47 47 47 / 50%);
-  transition: transform 0.5s ease-in-out;
-  transform: translate(500px);
+  animation-name: slide-left;
+  animation-duration: 0.5s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
 
   &__header {
     display: flex;
@@ -85,7 +87,16 @@
     margin-bottom: rem(14px);
   }
 
-  &--open {
-    transform: none;
+  &--closing {
+    animation-name: slide-right;
   }
+}
+
+@keyframes slide-left {
+  from { transform: translate(500px); }
+  to { transform: translate(0) }
+}
+
+@keyframes slide-right {
+  to { transform: translate(500px) }
 }

@@ -22,7 +22,7 @@ export const Notification = ({
   }, [toggle, progress, duration])
 
   return (
-    <div className={`notification ${hasTransitionedIn && isMounted ? "notification--open" : ""}`}>
+    <div className={`notification ${!isMounted && hasTransitionedIn ? "notification--closing" : ""}`}>
       <div className="notification__header">
         <h2 className="notification__title">{title}</h2>
         <button

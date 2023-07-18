@@ -40,26 +40,19 @@ export const Account = () => {
       <div className="user">
         <h2 className="title--lg user__name">{user.fullName}</h2>
         <h5 className="text--sm user__nickname">@{user.username}</h5>
-
         <div className="account__actions">
           <Action
-            name="email"
-            isInput={true}
-            type="primary"
-            auth={auth}>
+            type="email"
+            hasInput>
             Change e-mail
           </Action>
           <Action
-            name="password"
-            isInput={true}
-            type="secondary"
-            auth={auth}>
+            type="password"
+            hasInput>
             Change password
           </Action>
           <Action
-            name="quit"
-            type="danger"
-            auth={auth}>
+            type="quit">
             Quit
           </Action>
         </div>

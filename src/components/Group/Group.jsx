@@ -1,11 +1,12 @@
 import {useState} from "react"
+import {useMountTransition} from "../../hooks/useMountTransition"
 import "./Group.scss"
 
 export const Group = ({ name, children }) => {
-  // TODO: set isActive to false by default
   const [isActive, setIsActive] = useState(
     JSON.parse(localStorage.getItem(`group-${name}`))
   )
+  const hasTransitionedIn = useMountTransition(isActive, 200)
 
   const clickHandler = () => {
     localStorage.setItem(`group-${name}`, JSON.stringify(!isActive))
@@ -13,7 +14,7 @@ export const Group = ({ name, children }) => {
   }
 
   return (
-    <div className={`group ${isActive ? "active" : ""}`}>
+    <div className={`group ${isActive && hasTransitionedIn ? "group--active" : ""}`}>
       <button
         className="btn-reset group__top"
         aria-label="Open group"

@@ -74,7 +74,7 @@
     margin-bottom: rem(12px);
   }
 
-  &.active &__input {
+  &--active &__input {
     flex: 1;
     width: 100%;
     padding: 0 rem(10px);
@@ -95,5 +95,26 @@
 
   &__input {
     display: none;
+  }
+}
+
+.verification {
+  display: grid;
+  gap: rem(10px);
+  margin-top: rem(10px);
+
+  &__password {
+    padding: rem(6px);
+    font-size: rem(14px);
+    color: var(--color-light);
+    background-color: var(--color-gray);
+    border: none;
+    border-radius: 5px;
+    outline: none;
+  }
+
+  &__submit {
+    padding: rem(6px);
+    font-size: rem(13px);
   }
 }
