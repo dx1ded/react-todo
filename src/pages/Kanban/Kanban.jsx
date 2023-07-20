@@ -7,6 +7,7 @@ import {isObjectEmpty} from "../../utils"
 import {useDB} from "../../hooks/useDB"
 import {useAuth} from "../../hooks/useAuth"
 import {useSaveDebounced} from "../../hooks/useSaveDebounced"
+import {useMetrics} from "../../hooks/useMetrics"
 import {Loader} from "../../components/Loader/Loader"
 import "./Kanban.scss"
 
@@ -15,6 +16,7 @@ export const Kanban = () => {
   const db = useDB()
   const [doc, setDoc] = useState({})
   const [kanban, setKanban] = useState({})
+  const [saveMetrics, updateMetricsBy, setMetrics] = useMetrics(doc.ref, "kanban")
   const [saveData, contextHolder] = useSaveDebounced(doc.ref, "kanban")
 
   useEffect(() => {
@@ -23,16 +25,18 @@ export const Kanban = () => {
 
       try {
         const doc = await getUserDoc(db, user.email)
+        const data = doc.data()
 
         setDoc(doc)
-        setKanban(doc.data().kanban)
+        setKanban(data.kanban)
+        setMetrics(data.metrics.kanban)
       } catch (e) {
         console.error(e)
       }
     })
 
     return listen
-  }, [auth, db])
+  }, [auth, db, setMetrics])
 
   const markupData = [
     {
@@ -63,7 +67,8 @@ export const Kanban = () => {
     }
 
     setKanban(newState)
-    saveData(newState)
+    updateMetricsBy("To-Do", 1)
+    saveData(newState, saveMetrics)
   }
   const changeTask = (props, event, type) => {
     const [columnName, index] = props["data-rbd-draggable-id"].split("/")
@@ -88,8 +93,10 @@ export const Kanban = () => {
       [columnName]: kanban[columnName].filter((_, i) => i !== +index)
     }
 
+
     setKanban(newState)
-    saveData(newState)
+    updateMetricsBy(columnName, -1)
+    saveData(newState, saveMetrics)
   }
   const handleDragDrop = (results) => {
     const { source, destination } = results
@@ -108,7 +115,7 @@ export const Kanban = () => {
 
     const filteredCol = kanban[dId].filter((_, i) => i !== sIndex)
 
-    let newState = {
+    const newState = {
       ...kanban,
       [sId]: kanban[sId].filter((_, i) => i !== sIndex),
       [dId]: [
@@ -119,7 +126,9 @@ export const Kanban = () => {
     }
 
     setKanban(newState)
-    saveData(newState)
+    updateMetricsBy(sId, -1)
+    updateMetricsBy(dId, 1)
+    saveData(newState, saveMetrics)
   }
 
   if (isObjectEmpty(kanban)) {

@@ -1,7 +1,9 @@
 import {useState, useRef} from "react"
 import {flushSync} from "react-dom"
 
-export const Task = ({ name, isDone, index, todo, setTodo, provided, saveData }) => {
+const getField = (isDone) => isDone ? "Done" : "To-Do"
+
+export const Task = ({ name, isDone, index, saveMetrics, updateMetricsBy, todo, setTodo, provided, saveData }) => {
   const [isDoneButton, setIsDoneButton] = useState(false)
   const nameRef = useRef(null)
 
@@ -26,8 +28,13 @@ export const Task = ({ name, isDone, index, todo, setTodo, provided, saveData })
       tasks
     }
 
+    console.log("Old", getField(todo.tasks[index].done))
+    console.log("New", getField(newState.tasks[index].done))
+
     setTodo(newState)
-    saveData(newState)
+    updateMetricsBy(getField(todo.tasks[index].done), -1)
+    updateMetricsBy(getField(!todo.tasks[index].done), 1)
+    saveData(newState, saveMetrics)
   }
 
   const editTask = () => {
@@ -63,7 +70,8 @@ export const Task = ({ name, isDone, index, todo, setTodo, provided, saveData })
     }
 
     setTodo(newState)
-    saveData(newState)
+    updateMetricsBy(getField(todo.tasks[index].done), -1)
+    saveData(newState, saveMetrics)
   }
 
   return (

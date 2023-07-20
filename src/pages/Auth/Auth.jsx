@@ -2,8 +2,10 @@ import {useState} from "react"
 import {useNavigate} from "react-router-dom"
 import {signInWithEmailAndPassword, createUserWithEmailAndPassword} from "firebase/auth"
 import {collection, addDoc} from "firebase/firestore/lite"
+import {getUserDoc, getUserDocBy} from "../../getUserDoc"
 import {useAuth} from "../../hooks/useAuth"
 import {useDB} from "../../hooks/useDB"
+import {useNotification} from "../../components/Notification/useNotification"
 import "./Auth.scss"
 
 const RegisterForm = ({ onAction, onSubmit }) => {
@@ -12,11 +14,11 @@ const RegisterForm = ({ onAction, onSubmit }) => {
       <h4 className="title--md form__title">Sign up</h4>
       <fieldset className="form__group">
         <legend className="visually-hidden">Data to submit</legend>
-        <input type="text" name="firstName" className="form__input" placeholder="First Name" />
-        <input type="text" name="lastName" className="form__input" placeholder="Last Name" />
-        <input type="text" name="username" className="form__input" placeholder="Username" />
-        <input type="email" name="email" className="form__input" placeholder="Email" />
-        <input type="password" name="password" className="form__input" placeholder="Password" />
+        <input type="text" name="firstName" className="form__input" placeholder="First Name" required />
+        <input type="text" name="lastName" className="form__input" placeholder="Last Name" required />
+        <input type="text" name="username" className="form__input" placeholder="Username" required />
+        <input type="email" name="email" className="form__input" placeholder="Email" required />
+        <input type="password" name="password" className="form__input" placeholder="Password" required />
       </fieldset>
       <input type="submit" className="btn btn-reset form__submit" />
       <h4 className="form__action">
@@ -33,8 +35,8 @@ const LoginForm = ({ onAction, onSubmit }) => {
       <h4 className="title--md form__title">Sign in</h4>
       <fieldset className="form__group">
         <legend className="visually-hidden">Data to submit</legend>
-        <input type="email" name="email" className="form__input" placeholder="Email" />
-        <input type="password" name="password" className="form__input" placeholder="Password" />
+        <input type="email" name="email" className="form__input" placeholder="Email" required />
+        <input type="password" name="password" className="form__input" placeholder="Password" required />
       </fieldset>
       <input type="submit" className="btn btn-reset form__submit" />
       <h4 className="form__action">
@@ -48,13 +50,36 @@ const LoginForm = ({ onAction, onSubmit }) => {
 export const Auth = () => {
   const auth = useAuth()
   const db = useDB()
-  const [isAccount, setIsAccount] = useState(false)
+  const [api, contextHolder] = useNotification()
+  const [hasAccount, setHasAccount] = useState(false)
   const navigate = useNavigate()
 
   async function submitHandler(event) {
     event.preventDefault()
 
     const fData = new FormData(event.target)
+
+    // Check if the username is already used
+
+    const usernameAlreadyUsed = await getUserDocBy(db, "username", fData.get("username"))
+
+    if (usernameAlreadyUsed) return api.add({
+      title: "😕 Username is already used",
+      text: "The username you have entered is already used. Please use another one!",
+      duration: 5000
+    })
+
+    // Check if the email is already used
+
+    const emailAlreadyUsed = await getUserDoc(db, fData.get("email"))
+
+    if (emailAlreadyUsed) return api.add({
+      title: "😤 E-mail is already used",
+      text: "The e-mail you have entered is already used. Please use another one!",
+      duration: 5000
+    })
+
+    // Register / login
 
     try {
       const authMethod = event.target.dataset.auth === "login"
@@ -80,7 +105,32 @@ export const Auth = () => {
               "In progress": [],
               "Done": []
             },
-            todos: {}
+            todos: {},
+            metrics: {
+              kanban: [
+                { "To-Do": 0, "In progress": 0, "Done": 0 },
+                { "To-Do": 0, "In progress": 0, "Done": 0 },
+                { "To-Do": 0, "In progress": 0, "Done": 0 },
+                { "To-Do": 0, "In progress": 0, "Done": 0 }
+              ],
+              list: [
+                { "To-Do": 0, "Done": 0 },
+                { "To-Do": 0, "Done": 0 },
+                { "To-Do": 0, "Done": 0 },
+                { "To-Do": 0, "Done": 0 }
+              ]
+            }
+            // metrics: {
+            //   kanban: [
+            //     { "To-Do": 20, "In progress": 10, "Done": 50 }, // July
+            //     { "To-Do": 20, "In progress": 10, "Done": 50 }, // June
+            //     { "To-Do": 20, "In progress": 10, "Done": 50 }, // May
+            //   ],
+            //   list: {
+            //     "To-Do": 10,
+            //     "Done": 50
+            //   }
+            // }
           }
         )
       }
@@ -93,9 +143,10 @@ export const Auth = () => {
 
   return (
     <section className="auth">
-      {isAccount
-        ? <LoginForm onAction={() => setIsAccount(!isAccount)} onSubmit={submitHandler} />
-        : <RegisterForm onAction={() => setIsAccount((!isAccount))} onSubmit={submitHandler} />
+      {contextHolder}
+      {hasAccount
+        ? <LoginForm onAction={() => setHasAccount(false)} onSubmit={submitHandler} />
+        : <RegisterForm onAction={() => setHasAccount((true))} onSubmit={submitHandler} />
       }
     </section>
   )

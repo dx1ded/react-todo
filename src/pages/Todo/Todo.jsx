@@ -8,6 +8,7 @@ import {getUserDoc} from "../../getUserDoc"
 import {useAuth} from "../../hooks/useAuth"
 import {useDB} from "../../hooks/useDB"
 import {useSaveDebounced} from "../../hooks/useSaveDebounced"
+import {useMetrics} from "../../hooks/useMetrics"
 import {Task} from "./Task"
 import {Loader} from "../../components/Loader/Loader"
 import "./Todo.scss"
@@ -21,6 +22,7 @@ export const Todo = () => {
   const [todo, setTodo] = useState({})
   const [isLoading, setIsLoading] = useState(true)
   const [saveData, contextHolder, api] = useSaveDebounced(doc.ref, `todos.${todo.id}`)
+  const [saveMetrics, updateMetricsBy, setMetrics] = useMetrics(doc.ref, "list")
   const inputRef = useRef(null)
 
   useEffect(() => {
@@ -29,12 +31,14 @@ export const Todo = () => {
 
       try {
         const doc = await getUserDoc(db, user.email)
-        const todo = doc.data().todos[id]
+        const data = doc.data()
+        const todo = data.todos[id]
 
         if (!todo) return
 
         setDoc(doc)
         setTodo(todo)
+        setMetrics(data.metrics.list)
         setIsLoading(false)
       } catch (e) {
         console.error(e)
@@ -42,7 +46,7 @@ export const Todo = () => {
     })
 
     return listen
-  }, [auth, db, id])
+  }, [auth, db, id, setMetrics])
 
   if (isLoading) {
     return <Loader />
@@ -69,6 +73,12 @@ export const Todo = () => {
         [`todos.${id}`]: deleteField()
       })
 
+      const tasksToDo = todo.tasks.filter((task) => !task.done).length
+
+      updateMetricsBy("To-Do", -tasksToDo)
+      updateMetricsBy("Done", -(todo.tasks.length - tasksToDo))
+
+      saveMetrics()
       navigate("/list")
     }
 
@@ -108,7 +118,8 @@ export const Todo = () => {
     }
 
     setTodo(newState)
-    saveData(newState)
+    updateMetricsBy("To-Do", 1)
+    saveData(newState, saveMetrics)
 
     inputRef.current.value = ""
   }
@@ -188,6 +199,8 @@ export const Todo = () => {
                         name={task.name}
                         isDone={task.done}
                         index={i}
+                        saveMetrics={saveMetrics}
+                        updateMetricsBy={updateMetricsBy}
                         todo={todo}
                         setTodo={setTodo}
                         provided={provided}

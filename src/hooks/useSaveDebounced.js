@@ -7,13 +7,18 @@ const DEBOUNCED_INTERVAL = 1500
 export const useSaveDebounced = (doc, fieldName) => {
   const [api, contextHolder] = useNotification()
   const saveData = useDebouncedCallback(
-    (data) => {
-      updateDoc(doc, { [fieldName]: data })
-        .then(() => api.add({
-          title: "👍 Saved",
-          text: "Your data has been saved successfully!",
-          duration: 5000
-        }))
+    // cb?:
+    (data, cb) => {
+      updateDoc(doc, fieldName ? { [fieldName]: data } : data)
+        .then(() => {
+          api.add({
+            title: "👍 Saved",
+            text: "Your data has been saved successfully!",
+            duration: 5000
+          })
+
+          if (cb) cb()
+        })
     },
     DEBOUNCED_INTERVAL
   )
