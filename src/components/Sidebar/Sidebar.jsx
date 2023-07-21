@@ -15,8 +15,8 @@ const Nav = ({ items, currentPath }) => {
             <NavLink
               className={`link-reset nav__link ${isActivePath(item.path, currentPath) ? "nav__link--active" : ""}`}
               to={item.path}>
-              <span className="material-symbols-outlined">{item.icon}</span>
-              {item.name}
+              <span className="material-symbols-outlined nav__link-icon">{item.icon}</span>
+              <span className="nav__link-name">{item.name}</span>
             </NavLink>
           </li>
         ))}

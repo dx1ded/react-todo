@@ -7,18 +7,31 @@
 #root {
   display: flex;
   align-items: center;
+  justify-content: center;
   height: 100vh;
+
+  @media (max-height: em(650px)) {
+    height: 100%;
+  }
 }
 
 .app {
   display: grid;
-  flex-basis: 100%;
   grid-template-columns: rem(300px) 1fr;
+  width: 100%;
   height: rem(650px);
   background-color: #262424;
   border-radius: 8px;
 
   & > *:last-child {
     overflow-y: auto;
+  }
+
+  @include sm-laptop {
+    grid-template-columns: rem(200px) 1fr;
+  }
+
+  @include tablet {
+    grid-template-columns: max-content 1fr;
   }
 }

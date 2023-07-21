@@ -25,3 +25,9 @@
   // Shades
   // Z-indexes
 }
+
+@include tablet {
+  :root {
+    --container-horizontal-offset: #{em(6px)};
+  }
+}

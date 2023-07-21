@@ -10,6 +10,16 @@
 
   & .group {
     margin-top: rem(40px);
+
+    @include tablet {
+      margin-top: rem(30px);
+    }
+  }
+
+  @include tablet {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 }
 
@@ -22,16 +32,36 @@
     display: flex;
     align-items: center;
     padding: rem(10px) rem(12px);
-    font-size: rem(14px);
-    font-weight: 500;
     color: var(--color-light);
     cursor: pointer;
     background-color: var(--color-secondary);
     border-radius: 5px;
     transition: background-color 0.2s ease-in;
 
-    span {
+    &-icon {
       margin-right: rem(12px);
+
+      @include sm-laptop {
+        margin-right: rem(10px);
+        font-size: rem(22px);
+      }
+
+      @include tablet {
+        margin-right: 0;
+      }
+    }
+
+    &-name {
+      font-size: rem(14px);
+      font-weight: 500;
+
+      @include sm-laptop {
+        font-size: rem(13px);
+      }
+
+      @include tablet {
+        display: none;
+      }
     }
 
     &:hover {
@@ -40,6 +70,14 @@
 
     &.nav__link--active {
       background-color: var(--color-purple);
+    }
+
+    @include sm-laptop {
+      padding: rem(6px) rem(8px);
+    }
+
+    @include tablet {
+      justify-content: center;
     }
   }
 }

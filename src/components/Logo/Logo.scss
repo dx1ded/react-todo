@@ -8,6 +8,15 @@
   &__image {
     width: rem(26px);
     margin-right: rem(16px);
+
+    @include sm-laptop {
+      width: rem(22px);
+      margin-right: rem(10px);
+    }
+
+    @include tablet {
+      margin-right: 0;
+    }
   }
 
   &__name {
@@ -18,6 +27,14 @@
 
     span {
       color: var(--color-purple);
+    }
+
+    @include sm-laptop {
+      font-size: rem(28px);
+    }
+
+    @include tablet {
+      display: none;
     }
   }
 }
