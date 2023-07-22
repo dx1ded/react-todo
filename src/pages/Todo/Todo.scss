@@ -64,15 +64,6 @@
     }
   }
 
-  &__delete-confirm {
-    width: 100%;
-    padding: rem(8px);
-    margin-top: rem(12px);
-    font-size: rem(13px);
-    color: var(--color-light);
-    background-color: var(--color-purple);
-  }
-
   &__add {
     display: flex;
     margin-bottom: rem(60px);

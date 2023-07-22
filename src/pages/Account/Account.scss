@@ -52,6 +52,11 @@
     border-radius: 4px;
     transition: transform 0.2s ease-in-out;
     transform: translate(50%, rem(32px));
+
+    @include sm-laptop {
+      padding: rem(6px) rem(10px);
+      font-size: rem(12px);
+    }
   }
 
   &:hover &__change {
@@ -125,43 +130,5 @@
     flex: 1;
     width: 100%;
     padding: 0 rem(10px);
-  }
-}
-
-.file {
-  margin-top: rem(12px);
-
-  &__label {
-    display: block;
-    padding: rem(8px);
-    margin: 0 auto;
-    font-size: rem(13px);
-    text-align: center;
-    background-color: var(--color-purple);
-  }
-
-  &__input {
-    display: none;
-  }
-}
-
-.verification {
-  display: grid;
-  gap: rem(10px);
-  margin-top: rem(10px);
-
-  &__password {
-    padding: rem(6px);
-    font-size: rem(14px);
-    color: var(--color-light);
-    background-color: var(--color-gray);
-    border: none;
-    border-radius: 5px;
-    outline: none;
-  }
-
-  &__submit {
-    padding: rem(6px);
-    font-size: rem(13px);
   }
 }

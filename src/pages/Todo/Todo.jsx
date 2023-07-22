@@ -86,11 +86,13 @@ export const Todo = () => {
       title: "🗑️ Do you want to delete?",
       text: "If you really want to delete the todo-list, then confirm by clicking the button below",
       children: (
-        <button
-          className="btn btn-reset todo__delete-confirm"
-          onClick={confirm}>
-          Delete
-        </button>
+        <div className="notification__container">
+          <button
+            className="notification__button"
+            onClick={confirm}>
+            Delete
+          </button>
+        </div>
       )
     })
   }

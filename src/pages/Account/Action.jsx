@@ -109,9 +109,9 @@ export const Action = ({ type, hasInput, children }) => {
               text: "Enter your password again to the input below",
               duration: 999999,
               children: (
-                <form className="verification" onSubmit={handleSubmit}>
-                  <input type="password" name="password" className="verification__password" />
-                  <input type="submit" className="btn btn-reset btn--secondary verification__submit" />
+                <form className="notification__container" onSubmit={handleSubmit}>
+                  <input type="password" name="password" className="notification__input" />
+                  <input type="submit" className="notification__button" />
                 </form>
               )
             })

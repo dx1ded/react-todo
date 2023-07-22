@@ -42,3 +42,9 @@ export const Notification = ({
     </div>
   )
 }
+
+/* Classes to use
+* notification__container
+* notification__button
+* notification__input
+*/
