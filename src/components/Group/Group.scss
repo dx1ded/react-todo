@@ -21,6 +21,19 @@
       border-left: 5px solid transparent;
       transition: transform 0.2s ease-in-out;
     }
+
+    @include sm-laptop {
+      font-size: rem(12px);
+    }
+
+    @include tablet {
+      justify-content: center;
+      font-size: rem(10px);
+
+      &::after {
+        display: none;
+      }
+    }
   }
 
   &__body {

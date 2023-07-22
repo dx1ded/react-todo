@@ -2,6 +2,14 @@
 
 .dashboard {
   padding: rem(40px);
+
+  @include sm-laptop {
+    padding: rem(40px) rem(20px);
+  }
+
+  @include l-mobile {
+    padding: rem(30px) rem(14px);
+  }
 }
 
 .greeting {
@@ -9,12 +17,32 @@
 
   &__name {
     margin-bottom: rem(20px);
+
+    @include sm-laptop {
+      margin-bottom: rem(12px);
+    }
   }
 
   &__text {
     font-size: rem(14px);
     font-weight: 500;
     color: var(--color-blue);
+
+    @include sm-laptop {
+      font-size: rem(13px);
+    }
+
+    @include l-mobile {
+      font-size: rem(12px);
+    }
+  }
+
+  @include sm-laptop {
+    margin-bottom: rem(40px);
+  }
+
+  @include l-mobile {
+    margin-bottom: rem(30px);
   }
 }
 
@@ -27,16 +55,71 @@
     color: var(--color-light);
     background-color: var(--color-secondary);
     border-radius: 4px;
+
+    @include l-mobile {
+      padding: rem(8px) rem(12px);
+      margin-bottom: rem(18px);
+    }
   }
 
   &__row {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
+    display: flex;
     gap: rem(50px);
+
+    & > div {
+      flex: 0 0 auto;
+      height: rem(300px);
+
+      &:nth-child(1) {
+        width: calc(60% - #{rem(20px)});
+      }
+
+      &:nth-child(2) {
+        width: 40%;
+      }
+
+      @include resolution(600px) {
+        &:nth-child(1),
+        &:nth-child(2) {
+          display: flex;
+          justify-content: center;
+          width: 100%;
+        }
+      }
+
+      @include mobile {
+        height: rem(250px);
+      }
+    }
+
+    @include resolution(600px) {
+      flex-direction: column;
+      gap: rem(50px);
+    }
+
+    @include tablet {
+      gap: rem(20px);
+    }
   }
 
   &:not(:last-child) {
     margin-bottom: rem(50px);
     border-bottom: 2px solid var(--color-gray);
+  }
+
+  @include tablet {
+    padding-bottom: rem(30px);
+
+    &:not(:last-child) {
+      margin-bottom: rem(30px);
+    }
+  }
+
+  @include mobile {
+    padding-bottom: rem(20px);
+
+    &:not(:last-child) {
+      margin-bottom: rem(20px);
+    }
   }
 }

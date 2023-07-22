@@ -8,6 +8,18 @@
     align-items: flex-start;
     justify-content: space-between;
     margin-bottom: rem(50px);
+
+    @include sm-laptop {
+      margin-bottom: rem(30px);
+    }
+
+    @include tablet {
+      margin-bottom: rem(20px);
+    }
+
+    @include mobile {
+      margin-bottom: rem(14px);
+    }
   }
 
   &__name {
@@ -18,7 +30,21 @@
     background-color: var(--color-secondary);
     border: none;
     border-radius: 8px;
-    outline: none
+    outline: none;
+
+    @include sm-laptop {
+      padding: rem(10px) rem(16px);
+      font-size: rem(16px);
+    }
+
+    @include tablet {
+      padding: rem(8px) rem(14px);
+      font-size: rem(14px);
+    }
+
+    @include mobile {
+      font-size: rem(13px);
+    }
   }
 
   &__delete {
@@ -26,15 +52,16 @@
     font-size: rem(14px);
     color: var(--color-light);
     background-color: var(--color-blue-dark);
-  }
 
-  &__delete-confirm {
-    width: 100%;
-    padding: rem(8px);
-    margin-top: rem(12px);
-    font-size: rem(13px);
-    color: var(--color-light);
-    background-color: var(--color-purple);
+    @include sm-laptop {
+      padding: rem(10px) rem(14px);
+      font-size: rem(12px);
+    }
+
+    @include mobile {
+      padding: rem(8px) rem(10px);
+      font-size: rem(11px);
+    }
   }
 
   &__add {
@@ -54,6 +81,21 @@
       &::placeholder {
         color: var(--color-gray);
       }
+
+      @include sm-laptop {
+        padding: rem(14px);
+        font-size: rem(14px);
+      }
+
+      @include tablet {
+        padding: rem(12px);
+        font-size: rem(13px);
+      }
+
+      @include mobile {
+        padding: rem(10px);
+        font-size: rem(12px);
+      }
     }
 
     button {
@@ -62,6 +104,24 @@
       font-weight: 700;
       color: var(--color-white);
       background-color: var(--color-blue-dark);
+
+      @include sm-laptop {
+        padding: rem(14px) rem(18px);
+        font-size: rem(12px);
+      }
+
+      @include tablet {
+        padding: rem(10px) rem(14px);
+        font-size: rem(11px);
+      }
+    }
+
+    @include sm-laptop {
+      margin-bottom: rem(50px);
+    }
+
+    @include tablet {
+      margin-bottom: rem(40px);
     }
   }
 
@@ -69,6 +129,10 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: rem(20px);
+
+    @include sm-laptop {
+      margin-bottom: rem(14px);
+    }
   }
 
   &__label {
@@ -84,6 +148,37 @@
       background-color: var(--color-secondary);
       border-radius: 30px;
     }
+
+    @include sm-laptop {
+      font-size: rem(12px);
+
+      span {
+        padding: rem(2px) rem(6px);
+        margin-left: rem(6px);
+        font-size: rem(11px);
+      }
+    }
+
+    @include mobile {
+      font-size: rem(11px);
+
+      span {
+        margin-left: rem(4px);
+        font-size: rem(10px);
+      }
+    }
+  }
+
+  @include sm-laptop {
+    padding: rem(30px);
+  }
+
+  @include tablet {
+    padding: rem(20px);
+  }
+
+  @include mobile {
+    padding: rem(20px) rem(10px);
   }
 }
 
@@ -104,11 +199,31 @@
   &__drag {
     margin-right: rem(10px);
     color: var(--color-gray);
+
+    @include sm-laptop {
+      margin-right: rem(8px);
+      font-size: rem(20px);
+    }
+
+    @include tablet {
+      margin-right: rem(6px);
+      font-size: rem(18px);
+    }
   }
 
   &__done {
     margin-right: rem(14px);
     color: var(--color-blue);
+
+    span {
+      @include sm-laptop {
+        font-size: rem(20px);
+      }
+
+      @include tablet {
+        font-size: rem(18px);
+      }
+    }
   }
 
   &__right {
@@ -120,6 +235,14 @@
   &__name {
     font-size: rem(14px);
     font-weight: 400;
+
+    @include sm-laptop {
+      font-size: rem(13px);
+    }
+
+    @include mobile {
+      font-size: rem(12px);
+    }
   }
 
   &__edit {
@@ -152,5 +275,17 @@
   &__delete span {
     font-size: rem(22px);
     color: var(--color-gray);
+
+    @include sm-laptop {
+      font-size: rem(20px);
+    }
+
+    @include mobile {
+      font-size: rem(18px);
+    }
+  }
+
+  @include sm-laptop {
+    padding: rem(14px);
   }
 }

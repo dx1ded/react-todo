@@ -25,12 +25,12 @@ export const Photo = ({ user, setUser, db }) => {
       text: "Upload your photo by choosing a file (max size is 1MB)",
       duration: 15000,
       children: isLoading ? <Loader /> : (
-          <div className="file">
-            <label className="btn btn-reset file__label">
+          <div className="notification__container">
+            <label className="notification__button">
               Choose File
               <input
                 type="file"
-                className="file__input"
+                style={{ display: "none" }}
                 accept=".png,.jpeg,.jpg,.webp"
                 onChange={changePhoto}
               />

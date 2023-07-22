@@ -5,6 +5,14 @@
   align-items: center;
   justify-content: center;
   padding: rem(40px);
+
+  @include resolution(450px) {
+    padding: rem(20px);
+  }
+
+  @include mobile {
+    padding: rem(10px);
+  }
 }
 
 .form {
@@ -15,12 +23,20 @@
 
   &__title {
     margin-bottom: rem(36px);
+
+    @include sm-laptop {
+      margin-bottom: rem(26px);
+    }
   }
 
   &__group {
     padding: 0;
     margin-bottom: rem(24px);
     border: none;
+
+    @include sm-laptop {
+      margin-bottom: rem(16px);
+    }
   }
 
   &__input {
@@ -41,6 +57,11 @@
     &:not(:last-child) {
       margin-bottom: rem(10px);
     }
+
+    @include sm-laptop {
+      padding: rem(10px);
+      font-size: rem(12px);
+    }
   }
 
   &__submit {
@@ -52,6 +73,12 @@
     color: var(--color-light);
     background-color: var(--color-purple);
     border-radius: 6px;
+
+    @include sm-laptop {
+      padding: rem(8px);
+      margin-bottom: rem(20px);
+      font-size: rem(11px);
+    }
   }
 
   &__action {
@@ -64,5 +91,18 @@
       font-weight: 600;
       color: var(--color-blue-dark);
     }
+
+    @include sm-laptop {
+      font-size: rem(11px);
+    }
+  }
+
+  @include sm-laptop {
+    flex-basis: rem(340px);
+    padding: rem(26px) rem(14px);
+  }
+
+  @include mobile {
+    padding: rem(20px) rem(10px);
   }
 }

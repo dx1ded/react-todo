@@ -3,6 +3,7 @@ import {getLastMonths} from "../../utils"
 export function createOptions(text) {
   return {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "top"
