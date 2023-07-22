@@ -72,7 +72,17 @@ body {
       font-size: rem(30px);
     }
 
+    &--lg {
+      font-size: rem(24px);
+    }
+
     &--md {
+      font-size: rem(20px);
+    }
+  }
+
+  @include tablet {
+    &--lg {
       font-size: rem(20px);
     }
   }
@@ -91,6 +101,18 @@ body {
 .text {
   &--sm {
     font-size: rem(14px);
+  }
+
+  @include sm-laptop {
+    &--sm {
+      font-size: rem(12px);
+    }
+  }
+
+  @include tablet {
+    &--sm {
+      font-size: rem(11px);
+    }
   }
 }
 

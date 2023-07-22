@@ -5,11 +5,29 @@
 
   &__title {
     margin-bottom: rem(40px);
+
+    @include sm-laptop {
+      margin-bottom: rem(30px);
+    }
   }
 
   &__labels {
     margin-bottom: rem(24px);
     border-radius: 10px;
+
+    @include sm-laptop {
+      margin-bottom: rem(10px);
+      font-size: rem(14px);
+    }
+
+    @include tablet {
+      font-size: rem(13px);
+    }
+
+    @include mobile {
+      margin-bottom: rem(6px);
+      font-size: rem(12px);
+    }
   }
 
   &__add {
@@ -19,6 +37,16 @@
     color: var(--color-light);
     background-color: var(--color-blue-dark);
     border-radius: 30px;
+
+    @include sm-laptop {
+      padding: rem(10px);
+      font-size: rem(14px);
+    }
+
+    @include tablet {
+      padding: rem(10px);
+      font-size: rem(12px);
+    }
   }
 
   &__labels,
@@ -27,6 +55,26 @@
     align-items: center;
     justify-content: space-between;
     padding: rem(20px) rem(24px);
+
+    @include sm-laptop {
+      padding: rem(16px) rem(20px);
+    }
+
+    @include tablet {
+      padding: rem(12px) rem(16px);
+    }
+  }
+
+  @include sm-laptop {
+    padding: rem(30px);
+  }
+
+  @include tablet {
+    padding: rem(20px);
+  }
+
+  @include mobile {
+    padding: rem(20px) rem(10px);
   }
 }
 
@@ -39,14 +87,38 @@
   &__name {
     font-size: rem(14px);
     font-weight: 500;
+
+    @include sm-laptop {
+      font-size: rem(13px);
+    }
+
+    @include tablet {
+      font-size: rem(12px);
+    }
   }
 
   &__date {
     font-size: rem(15px);
+
+    @include sm-laptop {
+      font-size: rem(13px);
+    }
+
+    @include tablet {
+      font-size: rem(12px);
+    }
   }
 
   &:not(:last-child) {
     margin-bottom: rem(16px);
+
+    @include sm-laptop {
+      margin-bottom: rem(14px);
+    }
+
+    @include tablet {
+      margin-bottom: rem(12px);
+    }
   }
 }
 

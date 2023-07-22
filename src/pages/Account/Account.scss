@@ -4,6 +4,18 @@
   display: flex;
   align-items: flex-start;
   padding: rem(48px) rem(60px);
+
+  @include sm-laptop {
+    padding: rem(40px) rem(50px);
+  }
+
+  @include tablet {
+    padding: rem(30px) rem(40px);
+  }
+
+  @include resolution(500px) {
+    flex-direction: column;
+  }
 }
 
 .photo {
@@ -16,6 +28,16 @@
     height: rem(200px);
     object-fit: cover;
     border-radius: 100%;
+
+    @include sm-laptop {
+      width: rem(160px);
+      height: rem(160px)
+    }
+
+    @include tablet {
+      width: rem(130px);
+      height: rem(130px);
+    }
   }
 
   &__change {
@@ -35,6 +57,18 @@
   &:hover &__change {
     transform: translate(50%, rem(-18px));
   }
+
+  @include sm-laptop {
+    margin-right: rem(40px);
+  }
+
+  @include tablet {
+    margin-right: rem(30px);
+  }
+
+  @include resolution(500px) {
+    margin: 0 0 rem(30px);
+  }
 }
 
 .user {
@@ -47,6 +81,10 @@
   &__nickname {
     margin-bottom: rem(40px);
     color: var(--color-blue);
+
+    @include tablet {
+      margin-bottom: rem(30px);
+    }
   }
 }
 
@@ -57,6 +95,15 @@
     padding: rem(7px) rem(12px);
     margin-right: rem(10px);
     font-size: rem(13px);
+
+    @include sm-laptop {
+      font-size: rem(12px);
+    }
+
+    @include tablet {
+      padding: rem(5px) rem(9px);
+      font-size: rem(12px);
+    }
   }
 
   &__input {
