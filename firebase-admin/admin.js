@@ -18,8 +18,9 @@ cron.schedule("0 0 1 * *", () => {
   })
 
   const db = getFirestore(app)
+  const q = query(collection(db, "users"))
 
-  getDocs(query(collection(db, "users"))).then((snapshot) => {
+  getDocs(q).then((snapshot) => {
     snapshot.forEach((doc) => {
       const metrics = doc.data().metrics
 

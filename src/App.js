@@ -1,7 +1,4 @@
-import {Suspense} from "react"
 import {BrowserRouter, Routes, Route, Outlet} from "react-router-dom"
-import {AuthContext} from "./context/authContext"
-import {DatabaseContext} from "./context/databaseContext"
 
 import {Sidebar} from "./components/Sidebar/Sidebar"
 import {Dashboard} from "./pages/Dashboard/Dashboard"
@@ -19,24 +16,20 @@ const Layout = () => (
   </>
 )
 
-export const App = ({ auth, db }) => (
-  <AuthContext.Provider value={auth}>
-    <DatabaseContext.Provider value={db}>
-      <div className="container app">
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="auth" element={<Auth />} />
-              <Route path="about" element={<About />} />
-              <Route path="account" element={<Account />} />
-              <Route path="kanban" element={<Kanban />} />
-              <Route path="list" element={<List />} />
-              <Route path="list/:id" element={<Todo />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </div>
-    </DatabaseContext.Provider>
-  </AuthContext.Provider>
+export const App = () => (
+  <div className="container app">
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="auth" element={<Auth />} />
+          <Route path="about" element={<About />} />
+          <Route path="account" element={<Account />} />
+          <Route path="kanban" element={<Kanban />} />
+          <Route path="list" element={<List />} />
+          <Route path="list/:id" element={<Todo />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  </div>
 )

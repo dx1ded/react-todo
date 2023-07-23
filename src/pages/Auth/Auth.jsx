@@ -120,17 +120,6 @@ export const Auth = () => {
                 { "To-Do": 0, "Done": 0 }
               ]
             }
-            // metrics: {
-            //   kanban: [
-            //     { "To-Do": 20, "In progress": 10, "Done": 50 }, // July
-            //     { "To-Do": 20, "In progress": 10, "Done": 50 }, // June
-            //     { "To-Do": 20, "In progress": 10, "Done": 50 }, // May
-            //   ],
-            //   list: {
-            //     "To-Do": 10,
-            //     "Done": 50
-            //   }
-            // }
           }
         )
       }
