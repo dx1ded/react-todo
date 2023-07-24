@@ -1,5 +1,5 @@
 import {useState, useEffect, useCallback} from "react"
-import {updateDoc} from "firebase/firestore/lite"
+import {updateDoc} from "firebase/firestore"
 
 // type -> "kanban" | "list"
 export const useMetrics = (doc, type) => {

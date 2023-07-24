@@ -1,60 +1,36 @@
-import {useState, useEffect} from "react"
+import {useState} from "react"
 import {NavLink} from "react-router-dom"
 import {v4} from "uuid"
-import {onAuthStateChanged} from "firebase/auth"
-import {updateDoc} from "firebase/firestore/lite"
-import {getUserDoc} from "../../getUserDoc"
-import {useAuth} from "../../hooks/useAuth"
-import {useDB} from "../../hooks/useDB"
-import {Loader} from "../../components/Loader/Loader"
+import {updateDoc} from "firebase/firestore"
+import {useUser} from "@hooks/useUser"
+import {Loader} from "@components/Loader/Loader"
+import {isObjectEmpty} from "@/utils"
 import "./List.scss"
 
-const ListItem = ({ id, name, dateModified }) => {
-  const dateString = new Date(dateModified).toLocaleString("en-US", {
+const ListItem = ({ item }) => {
+  const dateString = new Date(item.date_modified).toLocaleString("en-US", {
     year: "numeric",
     month: "numeric",
     day: "numeric"
   })
 
   return (
-    <NavLink to={"/list/" + id} className="list-item">
-      <span className="list-item__name">{name}</span>
+    <NavLink to={`/list/${item.id}`} className="list-item">
+      <span className="list-item__name">{item.name}</span>
       <time className="list-item__date">{dateString}</time>
     </NavLink>
   )
 }
 
 export const List = () => {
-  const auth = useAuth()
-  const db = useDB()
-  const [doc, setDoc] = useState({})
-  const [list, setList] = useState({})
-  const [isLoading, setIsLoading] = useState(true)
-  // const [saveData, contextHolder] = useSaveDebounced(doc.ref, "todos")
-
-  useEffect(() => {
-    const listen = onAuthStateChanged(auth, async (user) => {
-      if (!user?.email) return
-
-      try {
-        const doc = await getUserDoc(db, user.email)
-
-        setDoc(doc)
-        setList(doc.data().todos)
-        setIsLoading(false)
-      } catch (e) {
-        console.error(e)
-      }
-    })
-
-    return listen
-  }, [auth, db])
+  const [todos, setTodos] = useState({})
+  const [user, loading, doc] = useUser()
 
   const addList = async () => {
     const id = v4()
 
     const newState = {
-      ...list,
+      ...user.todos,
       [id]: {
         id,
         name: "New List",
@@ -63,11 +39,11 @@ export const List = () => {
       }
     }
 
-    setList(newState)
+    setTodos(newState)
     await updateDoc(doc.ref, { "todos": newState })
   }
 
-  if (isLoading) {
+  if (loading) {
     return <Loader />
   }
 
@@ -80,17 +56,10 @@ export const List = () => {
           <h4 className="list__label">Date modified</h4>
         </div>
         <div className="list__items">
-          {Object.values(list)
+          {Object.values(isObjectEmpty(todos) ? user.todos : todos)
             .sort((a, b) => b.date_modified - a.date_modified)
-            .map((item) => (
-              <ListItem
-                id={item.id}
-                key={item.id}
-                name={item.name}
-                dateModified={item.date_modified}
-              />
-            )
-          )}
+            .map((item) => <ListItem key={item.id} item={item} />)
+          }
           <button className="btn btn-reset list__add" onClick={addList}>Add list</button>
         </div>
       </div>

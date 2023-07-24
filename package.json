@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^7.1.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -16,6 +17,7 @@
     "react-chartjs-2": "^5.2.0",
     "react-contenteditable": "^3.3.7",
     "react-dom": "^18.2.0",
+    "react-firebase-hooks": "^5.1.1",
     "react-router-dom": "^6.12.1",
     "react-scripts": "5.0.1",
     "sass": "^1.63.3",
@@ -24,17 +26,28 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
     "eject": "react-scripts eject",
-    "firebase-admin": "node firebase-admin/admin.js"
+    "firebase-script": "node firebase/script.js"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "rules": {
+      "no-sequences": "off",
+      "import/prefer-default-export": "off",
+      "react/react-in-jsx-scope": "off",
+      "semi": "off",
+      "quotes": "off",
+      "additional-rule": "off",
+      "react/function-component-definition": "off",
+      "arrow-body-style": "off",
+      "jsx-a11y/img-redundant-alt": "off"
+    }
   },
   "browserslist": {
     "production": [

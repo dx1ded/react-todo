@@ -22,9 +22,9 @@ const db = getFirestore(app)
 
 ReactDOM.createRoot(document.getElementById('root'))
   .render(
-    <React.StrictMode>
-      <FirebaseContext value={{auth, db}}>
+    // <React.StrictMode>
+      <FirebaseContext.Provider value={{auth, db}}>
         <App />
-      </FirebaseContext>
-    </React.StrictMode>
+      </FirebaseContext.Provider>
+    // </React.StrictMode>
   )

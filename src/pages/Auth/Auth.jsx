@@ -1,12 +1,40 @@
-import {useState} from "react"
+import {useState, useContext} from "react"
 import {useNavigate} from "react-router-dom"
 import {signInWithEmailAndPassword, createUserWithEmailAndPassword} from "firebase/auth"
 import {collection, addDoc} from "firebase/firestore/lite"
-import {getUserDoc, getUserDocBy} from "../../getUserDoc"
-import {useAuth} from "../../hooks/useAuth"
-import {useDB} from "../../hooks/useDB"
-import {useNotification} from "../../components/Notification/useNotification"
+import {getUserDoc, getUserDocBy} from "@/getUserDoc"
+import {FirebaseContext} from "@/context/firebaseContext"
+import {useNotification} from "@components/Notification/useNotification"
 import "./Auth.scss"
+
+function createUserModel(fData) {
+  return {
+    email: fData.get("email"),
+    username: fData.get("username"),
+    fullName: fData.get("firstName") + " " + fData.get("lastName"),
+    avatar: "https://i.stack.imgur.com/frlIf.png",
+    kanban: {
+      "To-Do": [],
+      "In progress": [],
+      "Done": []
+    },
+    todos: {},
+    metrics: {
+      kanban: [
+        { "To-Do": 0, "In progress": 0, "Done": 0 },
+        { "To-Do": 0, "In progress": 0, "Done": 0 },
+        { "To-Do": 0, "In progress": 0, "Done": 0 },
+        { "To-Do": 0, "In progress": 0, "Done": 0 }
+      ],
+      list: [
+        { "To-Do": 0, "Done": 0 },
+        { "To-Do": 0, "Done": 0 },
+        { "To-Do": 0, "Done": 0 },
+        { "To-Do": 0, "Done": 0 }
+      ]
+    }
+  }
+}
 
 const RegisterForm = ({ onAction, onSubmit }) => {
   return (
@@ -48,8 +76,7 @@ const LoginForm = ({ onAction, onSubmit }) => {
 }
 
 export const Auth = () => {
-  const auth = useAuth()
-  const db = useDB()
+  const {auth, db} = useContext(FirebaseContext)
   const [api, contextHolder] = useNotification()
   const [hasAccount, setHasAccount] = useState(false)
   const navigate = useNavigate()
@@ -59,25 +86,27 @@ export const Auth = () => {
 
     const fData = new FormData(event.target)
 
-    // Check if the username is already used
+    if (event.target.dataset.auth === "register") {
+      // Check if the username is already used
 
-    const usernameAlreadyUsed = await getUserDocBy(db, "username", fData.get("username"))
+      const usernameAlreadyUsed = await getUserDocBy(db, "username", fData.get("username"))
 
-    if (usernameAlreadyUsed) return api.add({
-      title: "😕 Username is already used",
-      text: "The username you have entered is already used. Please use another one!",
-      duration: 5000
-    })
+      if (usernameAlreadyUsed) return api.add({
+        title: "😕 Username is already used",
+        text: "The username you have entered is already used. Please use another one!",
+        duration: 5000
+      })
 
-    // Check if the email is already used
+      // Check if the email is already used
 
-    const emailAlreadyUsed = await getUserDoc(db, fData.get("email"))
+      const emailAlreadyUsed = await getUserDoc(db, fData.get("email"))
 
-    if (emailAlreadyUsed) return api.add({
-      title: "😤 E-mail is already used",
-      text: "The e-mail you have entered is already used. Please use another one!",
-      duration: 5000
-    })
+      if (emailAlreadyUsed) return api.add({
+        title: "😤 E-mail is already used",
+        text: "The e-mail you have entered is already used. Please use another one!",
+        duration: 5000
+      })
+    }
 
     // Register / login
 
@@ -95,32 +124,7 @@ export const Auth = () => {
       if (event.target.dataset.auth === "register") {
         await addDoc(
           collection(db, "users"),
-          {
-            email: fData.get("email"),
-            username: fData.get("username"),
-            fullName: fData.get("firstName") + " " + fData.get("lastName"),
-            avatar: "https://i.stack.imgur.com/frlIf.png",
-            kanban: {
-              "To-Do": [],
-              "In progress": [],
-              "Done": []
-            },
-            todos: {},
-            metrics: {
-              kanban: [
-                { "To-Do": 0, "In progress": 0, "Done": 0 },
-                { "To-Do": 0, "In progress": 0, "Done": 0 },
-                { "To-Do": 0, "In progress": 0, "Done": 0 },
-                { "To-Do": 0, "In progress": 0, "Done": 0 }
-              ],
-              list: [
-                { "To-Do": 0, "Done": 0 },
-                { "To-Do": 0, "Done": 0 },
-                { "To-Do": 0, "Done": 0 },
-                { "To-Do": 0, "Done": 0 }
-              ]
-            }
-          }
+          createUserModel(fData)
         )
       }
 
@@ -135,7 +139,7 @@ export const Auth = () => {
       {contextHolder}
       {hasAccount
         ? <LoginForm onAction={() => setHasAccount(false)} onSubmit={submitHandler} />
-        : <RegisterForm onAction={() => setHasAccount((true))} onSubmit={submitHandler} />
+        : <RegisterForm onAction={() => setHasAccount(true)} onSubmit={submitHandler} />
       }
     </section>
   )

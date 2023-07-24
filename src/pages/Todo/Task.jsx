@@ -28,9 +28,6 @@ export const Task = ({ name, isDone, index, saveMetrics, updateMetricsBy, todo, 
       tasks
     }
 
-    console.log("Old", getField(todo.tasks[index].done))
-    console.log("New", getField(newState.tasks[index].done))
-
     setTodo(newState)
     updateMetricsBy(getField(todo.tasks[index].done), -1)
     updateMetricsBy(getField(!todo.tasks[index].done), 1)

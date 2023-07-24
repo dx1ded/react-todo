@@ -1,6 +1,6 @@
 import {useDebouncedCallback} from "use-debounce"
-import {updateDoc} from "firebase/firestore/lite"
-import {useNotification} from "../components/Notification/useNotification"
+import {updateDoc} from "firebase/firestore"
+import {useNotification} from "@components/Notification/useNotification"
 
 const DEBOUNCED_INTERVAL = 1500
 

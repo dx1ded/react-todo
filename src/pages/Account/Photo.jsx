@@ -1,8 +1,7 @@
 import {useState} from "react"
-import {updateDoc} from "firebase/firestore/lite"
-import {getUserDoc} from "../../getUserDoc"
-import {useNotification} from "../../components/Notification/useNotification"
-import {Loader} from "../../components/Loader/Loader"
+import {updateDoc} from "firebase/firestore"
+import {useNotification} from "@components/Notification/useNotification"
+import {Loader} from "@components/Loader/Loader"
 
 function convertBase64(file) {
   return new Promise((resolve, reject) => {
@@ -14,7 +13,7 @@ function convertBase64(file) {
   })
 }
 
-export const Photo = ({ user, setUser, db }) => {
+export const Photo = ({ user, doc }) => {
   const [api, contextHolder] = useNotification()
   const [isLoading, setIsLoading] = useState(false)
   let id
@@ -56,13 +55,13 @@ export const Photo = ({ user, setUser, db }) => {
 
     try {
       const base64 = await convertBase64(file)
-      const doc = await getUserDoc(db, user.email)
 
       await updateDoc(doc.ref, { avatar: base64 })
 
       setIsLoading(false)
       api.remove(id)
-      setUser({...user, avatar: base64})
+
+      user.avatar = base64
     } catch(e) {
       console.error(e)
     }

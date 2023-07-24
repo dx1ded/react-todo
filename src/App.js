@@ -1,5 +1,5 @@
 import {BrowserRouter, Routes, Route, Outlet} from "react-router-dom"
-
+import {PrivateRoutes, PublicRoutes} from "./components/Routes"
 import {Sidebar} from "./components/Sidebar/Sidebar"
 import {Dashboard} from "./pages/Dashboard/Dashboard"
 import {Auth} from "./pages/Auth/Auth"
@@ -21,13 +21,19 @@ export const App = () => (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="auth" element={<Auth />} />
-          <Route path="about" element={<About />} />
-          <Route path="account" element={<Account />} />
-          <Route path="kanban" element={<Kanban />} />
-          <Route path="list" element={<List />} />
-          <Route path="list/:id" element={<Todo />} />
+          {/* Private Routes */}
+          <Route path="/" element={<PrivateRoutes />}>
+            <Route index element={<Dashboard />} />
+            <Route path="account" element={<Account />} />
+            <Route path="kanban" element={<Kanban />} />
+            <Route path="list" element={<List />} />
+            <Route path="list/:id" element={<Todo />} />
+          </Route>
+          {/* Public Routes */}
+          <Route path="/" element={<PublicRoutes />}>
+            <Route path="auth" element={<Auth />} />
+            <Route path="about" element={<About />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

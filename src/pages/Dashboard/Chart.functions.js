@@ -1,4 +1,4 @@
-import {getLastMonths} from "../../utils"
+import {getLastMonths} from "@/utils"
 
 export function createOptions(text) {
   return {
