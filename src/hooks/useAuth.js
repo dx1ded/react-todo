@@ -1,23 +1,10 @@
-import {useContext, useEffect} from "react"
-import {useNavigate} from "react-router-dom"
-import {onAuthStateChanged} from "firebase/auth"
-import {AuthContext} from "../context/authContext"
+import {useContext} from "react"
+import {useAuthState} from "react-firebase-hooks/auth"
+import {FirebaseContext} from "@/context/firebaseContext"
 
 export const useAuth = () => {
-  const auth = useContext(AuthContext)
-  const navigate = useNavigate()
+  const context = useContext(FirebaseContext)
+  const [user, authLoading] = useAuthState(context.auth)
 
-  useEffect(() => {
-    const listen = onAuthStateChanged(auth, (user) => {
-      if (!user && window.location.pathname !== "/auth") {
-        navigate("/auth")
-      } else if (user && window.location.pathname === "/auth") {
-        navigate("/")
-      }
-    })
-
-    return listen
-  }, [auth, navigate])
-
-  return auth
+  return [user, authLoading]
 }

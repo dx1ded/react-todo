@@ -1,10 +1,11 @@
-import './styles/index.scss'
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import "./styles/index.scss"
+import React from "react"
+import ReactDOM from "react-dom/client"
 import {initializeApp} from "firebase/app"
 import {getAuth} from "firebase/auth"
 import {getFirestore} from "firebase/firestore/lite"
 import {App} from "./App"
+import {FirebaseContext} from "./context/firebaseContext"
 
 const app = initializeApp({
   apiKey: "AIzaSyBFQnx80j5XA2_noPvqThgtvCce3unQkdI",
@@ -22,6 +23,8 @@ const db = getFirestore(app)
 ReactDOM.createRoot(document.getElementById('root'))
   .render(
     // <React.StrictMode>
-      <App auth={auth} db={db} />
+      <FirebaseContext.Provider value={{auth, db}}>
+        <App />
+      </FirebaseContext.Provider>
     // </React.StrictMode>
   )

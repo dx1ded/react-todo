@@ -1,42 +1,25 @@
 import {useState, useEffect} from "react"
 import {DragDropContext, Droppable, Draggable} from "react-beautiful-dnd"
 import ContentEditable from "react-contenteditable"
-import {onAuthStateChanged} from "firebase/auth"
-import {getUserDoc} from "../../getUserDoc"
-import {isObjectEmpty} from "../../utils"
-import {useDB} from "../../hooks/useDB"
-import {useAuth} from "../../hooks/useAuth"
-import {useSaveDebounced} from "../../hooks/useSaveDebounced"
-import {useMetrics} from "../../hooks/useMetrics"
-import {Loader} from "../../components/Loader/Loader"
+import {useUser} from "@hooks/useUser"
+import {useSaveDebounced} from "@hooks/useSaveDebounced"
+import {useMetrics} from "@hooks/useMetrics"
+import {isObjectEmpty} from "@/utils"
+import {Loader} from "@components/Loader/Loader"
 import "./Kanban.scss"
 
 export const Kanban = () => {
-  const auth = useAuth()
-  const db = useDB()
-  const [doc, setDoc] = useState({})
+  const [user, loading, doc] = useUser()
   const [kanban, setKanban] = useState({})
   const [saveMetrics, updateMetricsBy, setMetrics] = useMetrics(doc.ref, "kanban")
   const [saveData, contextHolder] = useSaveDebounced(doc.ref, "kanban")
 
   useEffect(() => {
-    const listen = onAuthStateChanged(auth, async (user) => {
-      if (!user?.email) return
-
-      try {
-        const doc = await getUserDoc(db, user.email)
-        const data = doc.data()
-
-        setDoc(doc)
-        setKanban(data.kanban)
-        setMetrics(data.metrics.kanban)
-      } catch (e) {
-        console.error(e)
-      }
-    })
-
-    return listen
-  }, [auth, db, setMetrics])
+    if (!loading && isObjectEmpty(kanban)) {
+      setKanban(user.kanban)
+      setMetrics(user.metrics.kanban)
+    }
+  }, [loading, kanban, setKanban, setMetrics, user])
 
   const markupData = [
     {
@@ -131,7 +114,7 @@ export const Kanban = () => {
     saveData(newState, saveMetrics)
   }
 
-  if (isObjectEmpty(kanban)) {
+  if (loading || isObjectEmpty(kanban)) {
     return <Loader />
   }
 

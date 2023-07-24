@@ -1,5 +1,3 @@
-import {useState, useEffect} from "react"
-import {onAuthStateChanged} from "firebase/auth"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,11 +10,8 @@ import {
 } from "chart.js"
 import {Bar, Pie} from "react-chartjs-2"
 import {createOptions, createBarData, createPieData} from "./Chart.functions"
-import {isObjectEmpty} from "../../utils"
-import {getUserDoc} from "../../getUserDoc"
-import {useAuth} from "../../hooks/useAuth"
-import {useDB} from "../../hooks/useDB"
-import {Loader} from "../../components/Loader/Loader"
+import {useUser} from "@hooks/useUser"
+import {Loader} from "@components/Loader/Loader"
 import "./Dashboard.scss"
 
 ChartJS.register(
@@ -39,29 +34,9 @@ const Info = ({ type, children }) => {
 }
 
 export const Dashboard = () => {
-  const auth = useAuth()
-  const db = useDB()
-  const [user, setUser] = useState({})
+  const [user, loading] = useUser()
 
-  useEffect(() => {
-    const listen = onAuthStateChanged(auth, async (user) => {
-      if (!user?.email) return
-
-      try {
-        const doc = await getUserDoc(db, user.email)
-
-        setUser(doc.data())
-        console.log(doc.data().metrics.kanban)
-      } catch (e) {
-        console.error(e)
-      }
-    })
-
-    return listen
-  }, [auth, db])
-
-
-  if (isObjectEmpty(user)) {
+  if (loading) {
     return <Loader />
   }
 

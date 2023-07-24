@@ -1,4 +1,4 @@
-import {useState, useRef} from "react"
+import {useState, useContext, useRef} from "react"
 import {
   signOut,
   updateEmail,
@@ -6,16 +6,13 @@ import {
   reauthenticateWithCredential,
   EmailAuthProvider
 } from "firebase/auth"
-import {updateDoc} from "firebase/firestore/lite"
-import {useDB} from "../../hooks/useDB"
-import {useAuth} from "../../hooks/useAuth"
-import {getUserDoc} from "../../getUserDoc"
-import {useNotification} from "../../components/Notification/useNotification"
+import {updateDoc} from "firebase/firestore"
+import {FirebaseContext} from "@/context/firebaseContext"
+import {getUserDoc} from "@/getUserDoc"
+import {useNotification} from "@components/Notification/useNotification"
 
 const getErrorObject = (validity, type) => {
   let obj = {}
-
-  console.log(validity)
 
   if (validity.tooShort || validity.valueMissing) {
     obj = {
@@ -32,11 +29,10 @@ const getErrorObject = (validity, type) => {
   return obj
 }
 
-export const Action = ({ type, hasInput, children }) => {
-  const db = useDB()
-  const auth = useAuth()
+export const Action = ({ type, hasInput, doc, children }) => {
   const [api, contextHandler] = useNotification()
   const [isActive, setIsActive] = useState(false)
+  const {auth, db} = useContext(FirebaseContext)
   const inputRef = useRef(null)
 
   const buttonTypes = {
@@ -93,7 +89,6 @@ export const Action = ({ type, hasInput, children }) => {
         .then(async () => {
           // Update user's firestore object since it has changed
           if (dataName === "email") {
-            const doc = await getUserDoc(db, oldEmail)
             await updateDoc(doc.ref, { email: input.value })
           }
 

@@ -2,53 +2,32 @@ import {useState, useEffect, useRef} from "react"
 import {DragDropContext, Droppable, Draggable} from "react-beautiful-dnd"
 import {useParams, useNavigate} from "react-router-dom"
 import {v4} from "uuid"
-import {onAuthStateChanged} from "firebase/auth"
-import {updateDoc, deleteField} from "firebase/firestore/lite"
-import {getUserDoc} from "../../getUserDoc"
-import {useAuth} from "../../hooks/useAuth"
-import {useDB} from "../../hooks/useDB"
-import {useSaveDebounced} from "../../hooks/useSaveDebounced"
-import {useMetrics} from "../../hooks/useMetrics"
+import {updateDoc, deleteField} from "firebase/firestore"
+import {useUser} from "@hooks/useUser"
+import {useSaveDebounced} from "@hooks/useSaveDebounced"
+import {useMetrics} from "@hooks/useMetrics"
+import {Loader} from "@components/Loader/Loader"
 import {Task} from "./Task"
-import {Loader} from "../../components/Loader/Loader"
+import {isObjectEmpty} from "@/utils"
 import "./Todo.scss"
 
 export const Todo = () => {
-  const auth = useAuth()
-  const db = useDB()
   const { id } = useParams()
   const navigate = useNavigate()
-  const [doc, setDoc] = useState({})
+  const [user, loading, doc] = useUser()
   const [todo, setTodo] = useState({})
-  const [isLoading, setIsLoading] = useState(true)
   const [saveData, contextHolder, api] = useSaveDebounced(doc.ref, `todos.${todo.id}`)
   const [saveMetrics, updateMetricsBy, setMetrics] = useMetrics(doc.ref, "list")
   const inputRef = useRef(null)
 
   useEffect(() => {
-    const listen = onAuthStateChanged(auth, async (user) => {
-      if (!user?.email) return
+    if (!loading && isObjectEmpty(todo)) {
+      setTodo(user.todos[id])
+      setMetrics(user.metrics.list)
+    }
+  }, [loading, todo, setTodo, setMetrics, user])
 
-      try {
-        const doc = await getUserDoc(db, user.email)
-        const data = doc.data()
-        const todo = data.todos[id]
-
-        if (!todo) return
-
-        setDoc(doc)
-        setTodo(todo)
-        setMetrics(data.metrics.list)
-        setIsLoading(false)
-      } catch (e) {
-        console.error(e)
-      }
-    })
-
-    return listen
-  }, [auth, db, id, setMetrics])
-
-  if (isLoading) {
+  if (loading || isObjectEmpty(todo)) {
     return <Loader />
   }
 
