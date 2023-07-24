@@ -46,7 +46,9 @@
       "additional-rule": "off",
       "react/function-component-definition": "off",
       "arrow-body-style": "off",
-      "jsx-a11y/img-redundant-alt": "off"
+      "jsx-a11y/img-redundant-alt": "off",
+      "no-throw-literal": "off",
+      "default-case": "off"
     }
   },
   "browserslist": {

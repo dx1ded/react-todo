@@ -65,6 +65,7 @@
   }
 
   &__submit {
+    position: relative;
     width: 100%;
     padding: rem(10px);
     margin-bottom: rem(30px);
@@ -74,10 +75,31 @@
     background-color: var(--color-purple);
     border-radius: 6px;
 
+    &::after {
+      content: "Submit";
+    }
+
+    &:disabled {
+      opacity: 0.9;
+
+      &::after {
+        display: inline-block;
+        content: "";
+        border: 6px solid var(--color-light);
+        border-right-color: var(--color-purple);
+        border-radius: 50%;
+        animation: spin 1s infinite linear;
+      }
+    }
+
     @include sm-laptop {
       padding: rem(8px);
       margin-bottom: rem(20px);
       font-size: rem(11px);
+
+      &:disabled::after {
+        border-width: 5px;
+      }
     }
   }
 
@@ -106,3 +128,5 @@
     padding: rem(20px) rem(10px);
   }
 }
+
+@keyframes spin { to {transform: rotate(1turn);} }

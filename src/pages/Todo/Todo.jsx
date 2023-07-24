@@ -25,7 +25,7 @@ export const Todo = () => {
       setTodo(user.todos[id])
       setMetrics(user.metrics.list)
     }
-  }, [loading, todo, setTodo, setMetrics, user])
+  }, [loading, todo, setTodo, setMetrics, user, id])
 
   if (loading || isObjectEmpty(todo)) {
     return <Loader />
