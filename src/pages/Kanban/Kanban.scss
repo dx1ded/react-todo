@@ -82,7 +82,7 @@
     min-height: rem(100px);
 
     @include resolution(520px) {
-      min-height: auto;
+      min-height: rem(20px);
     }
   }
 
