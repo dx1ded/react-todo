@@ -24,7 +24,7 @@ export const App = () => {
 
   return (
     <div className="container app">
-      <BrowserRouter>
+      <BrowserRouter basename="/react-todo">
         <Routes>
           <Route path="/" element={<Layout />}>
             {/* Private Routes */}
