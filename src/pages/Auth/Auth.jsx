@@ -93,12 +93,16 @@ export const Auth = () => {
           photoURL: defaultPhotoURL
         })
 
+
         // Creating a kanban for the user
         await setDoc(doc(firestore, "kanban", auth.currentUser.uid), {
           todo: [],
           inProgress: [],
           done: []
         })
+
+        // Reloading the profile
+        await auth.currentUser.reload()
       }
     } catch (e) {
       setIsLoading(false)

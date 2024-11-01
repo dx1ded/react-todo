@@ -1,4 +1,4 @@
-import dayjs from 'dayjs'
+import dayjs from "dayjs"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -114,7 +114,7 @@ export const Dashboard = () => {
     return <Loader />
   }
 
-  const firstName = user.displayName.split(" ")[0]
+  const firstName = user.displayName?.split(" ")[0]
 
   return (
     <section className="dashboard">

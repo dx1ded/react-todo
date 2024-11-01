@@ -1,12 +1,13 @@
-import {useEffect} from "react";
+import {useEffect, useMemo} from "react"
 import {getAuth} from "firebase/auth"
 import {useAuthContext, defaultUser} from "@/context/authContext"
 
 export function OnAuthStateChanged({ children }) {
   const { setUser, setIsLoading } = useAuthContext()
+  const auth = useMemo(() => getAuth(), [])
 
   useEffect(() => {
-    return getAuth().onIdTokenChanged((user) => {
+    return auth.onIdTokenChanged((user) => {
       if (!user) {
         setUser(defaultUser)
         return setIsLoading(false)
@@ -20,7 +21,7 @@ export function OnAuthStateChanged({ children }) {
       })
       setIsLoading(false)
     })
-  }, [setIsLoading, setUser])
+  }, [auth, setIsLoading, setUser])
 
   return children
 }
