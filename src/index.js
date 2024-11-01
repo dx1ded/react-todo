@@ -2,12 +2,11 @@ import "./styles/index.scss"
 import React from "react"
 import ReactDOM from "react-dom/client"
 import {initializeApp} from "firebase/app"
-import {getAuth} from "firebase/auth"
-import {getFirestore} from "firebase/firestore/lite"
+import {OnAuthStateChanged} from "@/components/OnAuthStateChanged"
+import {AuthProvider} from "@/context/authContext"
 import {App} from "./App"
-import {FirebaseContext} from "./context/firebaseContext"
 
-const app = initializeApp({
+initializeApp({
   apiKey: "AIzaSyBFQnx80j5XA2_noPvqThgtvCce3unQkdI",
   authDomain: "react-todo-eab1e.firebaseapp.com",
   projectId: "react-todo-eab1e",
@@ -17,14 +16,13 @@ const app = initializeApp({
   measurementId: "G-K9EZ8RD945"
 })
 
-const auth = getAuth(app)
-const db = getFirestore(app)
-
 ReactDOM.createRoot(document.getElementById('root'))
   .render(
-    // <React.StrictMode>
-      <FirebaseContext.Provider value={{auth, db}}>
-        <App />
-      </FirebaseContext.Provider>
-    // </React.StrictMode>
+    <React.StrictMode>
+      <AuthProvider>
+        <OnAuthStateChanged>
+          <App />
+        </OnAuthStateChanged>
+      </AuthProvider>
+    </React.StrictMode>
   )

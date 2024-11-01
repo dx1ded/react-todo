@@ -1,4 +1,3 @@
-import {useEffect} from "react"
 import {BrowserRouter, Routes, Route, Outlet} from "react-router-dom"
 import {PrivateRoutes, PublicRoutes} from "./components/Routes"
 import {Sidebar} from "./components/Sidebar/Sidebar"
@@ -18,10 +17,6 @@ const Layout = () => (
 )
 
 export const App = () => {
-  useEffect(() => {
-    document.title = "To-Do Application"
-  }, [])
-
   return (
     <div className="container app">
       <BrowserRouter basename="/react-todo">

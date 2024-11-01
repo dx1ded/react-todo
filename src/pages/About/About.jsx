@@ -9,7 +9,7 @@ export const About = () => {
         <p>To-Do application with authorization and routing. There are both List and Kanban available types of To-dos.</p>
         <p>Github: <a href="https://github.com/dx1ded" target="_blank" rel="noreferrer">@dx1ded</a></p>
       </div>
-      <p className="about__copyright">&copy; 2023 Volodymyr Doskochynskyi</p>
+      <p className="about__copyright">&copy; 2024 Volodymyr Doskochynskyi</p>
     </section>
   )
 }

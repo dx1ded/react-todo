@@ -1,86 +1,96 @@
-import {useState, useEffect} from "react"
-import {DragDropContext, Droppable, Draggable} from "react-beautiful-dnd"
+import {useEffect, useMemo, useState} from "react"
+import {nanoid} from "nanoid"
+import {useDebouncedCallback} from "use-debounce"
+import {getFirestore, doc, getDoc, updateDoc} from "firebase/firestore"
+import {DragDropContext, Droppable, Draggable} from "@hello-pangea/dnd"
 import ContentEditable from "react-contenteditable"
-import {useUser} from "@hooks/useUser"
-import {useSaveDebounced} from "@hooks/useSaveDebounced"
-import {useMetrics} from "@hooks/useMetrics"
-import {isObjectEmpty} from "@/utils"
-import {Loader} from "@components/Loader/Loader"
+import {useAuthContext} from "@/context/authContext"
+import {useNotification} from "@/components/Notification/useNotification"
+import {Loader} from "@/components/Loader/Loader"
 import "./Kanban.scss"
 
+const DEBOUNCED_SAVE_TIME = 1500
+
 export const Kanban = () => {
-  const [user, loading, doc] = useUser()
-  const [kanban, setKanban] = useState({})
-  const [saveMetrics, updateMetricsBy, setMetrics] = useMetrics(doc.ref, "kanban")
-  const [saveData, contextHolder] = useSaveDebounced(doc.ref, "kanban")
+  const { user } = useAuthContext()
+  const [loading, setLoading] = useState(true)
+  const [kanban, setKanban] = useState( {
+    todo: [],
+    inProgress: [],
+    done: []
+  })
+  const kanbanDoc = useMemo(() => doc(getFirestore(), "kanban", user.id), [user.id])
+  const [api, contextHolder] = useNotification()
 
   useEffect(() => {
-    if (!loading && isObjectEmpty(kanban)) {
-      setKanban(user.kanban)
-      setMetrics(user.metrics.kanban)
-    }
-  }, [loading, kanban, setKanban, setMetrics, user])
+    if (!user.id) return
 
-  const markupData = [
-    {
-      name: "To-Do",
-      icon: "radio_button_unchecked",
-      iconColor: "red",
-      newButton: true
-    },
-    {
-      name: "In progress",
-      icon: "radio_button_checked",
-      iconColor: "yellow"
-    },
-    {
-      name: "Done",
-      icon: "expand_circle_down",
-      iconColor: "green"
+    async function fetchKanban() {
+      const snapshot = await getDoc(kanbanDoc)
+
+      if (snapshot.exists()) {
+        setKanban(snapshot.data())
+      }
+
+      setLoading(false)
     }
-  ]
+
+    fetchKanban()
+  }, [kanbanDoc, user.id])
+
+  const saveKanbanDebounced = useDebouncedCallback(async () => {
+    try {
+      await updateDoc(kanbanDoc, kanban)
+      api.add({
+        title: "👍 Saved",
+        text: "Your data has been saved successfully!",
+        duration: 5000
+      })
+    } catch (e) {
+      console.log(e)
+      api.add({
+        title: "😔 Unknown error",
+        text: "Please, try again!",
+        duration: 5000
+      })
+    }
+  }, DEBOUNCED_SAVE_TIME)
+
+  // Saving on exit
+  useEffect(() => saveKanbanDebounced.flush, [saveKanbanDebounced.flush])
 
   const addNewTask = () => {
-    const newState = {
-      ...kanban,
-      "To-Do": [
-        ...kanban["To-Do"],
-        { title: "New task", text: "Task description" }
-      ]
+    const newTask = {
+      id: nanoid(8),
+      name: "New task",
+      description: "Task description",
+      createdAt: Date.now(),
     }
 
-    setKanban(newState)
-    updateMetricsBy("To-Do", 1)
-    saveData(newState, saveMetrics)
+    setKanban((prev) => ({ ...prev, todo: [...prev.todo, newTask] }))
+    saveKanbanDebounced()
   }
-  const changeTask = (props, event, type) => {
-    const [columnName, index] = props["data-rbd-draggable-id"].split("/")
 
-    const newState = {
-      ...kanban,
-      [columnName]: kanban[columnName].map(
-        (item, i) => i === +index
-          ? { ...kanban[columnName][index], [type]: event.target.value }
-          : item
-      )
-    }
+  const changeTask = (draggableId, field, value) => {
+    const [column, id] = draggableId.split("/")
 
-    setKanban(newState)
-    saveData(newState)
+    setKanban((prev) => ({
+      ...prev,
+      [column]: prev[column].map((t) => t.id === id ? { ...t, [field]: value } : t)
+    }))
+    saveKanbanDebounced()
   }
-  const deleteTask = (props) => {
-    const [columnName, index] = props["data-rbd-draggable-id"].split("/")
 
-    const newState = {
-      ...kanban,
-      [columnName]: kanban[columnName].filter((_, i) => i !== +index)
-    }
+  const deleteTask = (draggableId) => {
+    const [column, id] = draggableId.split("/")
 
-
-    setKanban(newState)
-    updateMetricsBy(columnName, -1)
-    saveData(newState, saveMetrics)
+    setKanban((prev) => ({
+      ...prev,
+      [column]: prev[column].filter((t) => t.id !== id)
+    }))
+    saveKanbanDebounced()
   }
+
   const handleDragDrop = (results) => {
     const { source, destination } = results
 
@@ -91,32 +101,52 @@ export const Kanban = () => {
       )
     ) return
 
+    // `sId` and `dId` are conventionally equal to task statuses - "todo" /
+    //  "isProgress" / "done"
     const [
       { droppableId: sId, index: sIndex },
       { droppableId: dId, index: dIndex }
     ] = [source, destination]
 
-    const filteredCol = kanban[dId].filter((_, i) => i !== sIndex)
+    const target = kanban[sId][sIndex]
 
-    const newState = {
-      ...kanban,
-      [sId]: kanban[sId].filter((_, i) => i !== sIndex),
-      [dId]: [
-        ...(sId === dId ? filteredCol : kanban[dId]).slice(0, dIndex),
-        kanban[sId][sIndex],
-        ...(sId === dId ? filteredCol : kanban[dId]).slice(dIndex)
-      ]
+    if (!target) {
+      throw new Error("Task not found")
     }
 
+    const newState = { ...kanban }
+
+    newState[sId].splice(sIndex, 1)
+    newState[dId].splice(dIndex, 0, target)
+
     setKanban(newState)
-    updateMetricsBy(sId, -1)
-    updateMetricsBy(dId, 1)
-    saveData(newState, saveMetrics)
+    saveKanbanDebounced()
   }
 
-  if (loading || isObjectEmpty(kanban)) {
-    return <Loader />
-  }
+  if (loading) return <Loader />
+
+  const markupData = [{
+      name: "To-Do",
+      column: "todo",
+      icon: "radio_button_unchecked",
+      iconColor: "red",
+      newButton: true,
+    },
+    {
+      name: "In progress",
+      column: "inProgress",
+      icon: "radio_button_checked",
+      iconColor: "yellow",
+      newButton: false,
+    },
+    {
+      name: "Done",
+      column: "done",
+      icon: "expand_circle_down",
+      iconColor: "green",
+      newButton: false,
+    }
+  ]
 
   return (
     <>
@@ -126,24 +156,24 @@ export const Kanban = () => {
         <DragDropContext onDragEnd={handleDragDrop}>
           <div className="kanban__container">
             {markupData.map((data) =>
-              <div className="kanban__column" key={data.name}>
+              <div key={data.name} className="kanban__column">
                 <div className="kanban__header">
                   <span
                     className="material-symbols-outlined"
-                    style={{color: data.iconColor}}>
+                    style={{ color: data.iconColor }}>
                     {data.icon}
                   </span>
                   <h3 className="kanban__name">{data.name}</h3>
                 </div>
-                <Droppable droppableId={data.name} type="group">
+                <Droppable droppableId={data.column} type="group">
                   {(provided) => (
                     <ul
                       className="list-reset kanban__list"
                       {...provided.droppableProps}
                       ref={provided.innerRef}
                     >
-                      {kanban[data.name].map((task, i) =>
-                        <Draggable draggableId={`${data.name}/${i}`} key={i} index={i}>
+                      {kanban[data.column].map((task, i) =>
+                        <Draggable key={task.id} draggableId={`${data.column}/${task.id}`} index={i}>
                           {(provided) => (
                             <li
                               className="kanban-item"
@@ -153,7 +183,7 @@ export const Kanban = () => {
                               <div className="kanban-item__actions">
                                 <span
                                   className="material-symbols-outlined kanban-item__delete"
-                                  onClick={() => deleteTask(provided.draggableProps)}>
+                                  onClick={() => deleteTask(provided.draggableProps["data-rfd-draggable-id"])}>
                                   delete
                                 </span>
                                 <span
@@ -165,14 +195,14 @@ export const Kanban = () => {
                               <ContentEditable
                                 className="kanban-item__title"
                                 tagName="h4"
-                                html={task.title}
-                                onChange={(event) => changeTask(provided.draggableProps, event, "title")}
+                                html={task.name}
+                                onChange={(e) => changeTask(provided.draggableProps["data-rfd-draggable-id"], "name", e.target.value)}
                               />
                               <ContentEditable
                                 className="kanban-item__description"
                                 tagName="p"
-                                html={task.text}
-                                onChange={(event) => changeTask(provided.draggableProps, event, "text")}
+                                html={task.description}
+                                onChange={(e) => changeTask(provided.draggableProps["data-rfd-draggable-id"], "description", e.target.value)}
                               />
                             </li>
                           )}

@@ -1,38 +1,35 @@
-import {useUser} from "@hooks/useUser"
 import {Photo} from "./Photo"
 import {Action} from "./Action"
-import {Loader} from "@components/Loader/Loader"
+import {Loader} from "@/components/Loader/Loader"
+import {useAuthContext} from "@/context/authContext"
 import "./Account.scss"
 
 export const Account = () => {
-  const [user, loading, doc] = useUser()
+  const { user, isLoading } = useAuthContext()
 
-  if (loading) {
+  if (isLoading) {
     return <Loader />
   }
 
   return (
     <section className="account">
-      <Photo user={user} doc={doc} />
+      <Photo photoURL={user.photoURL} />
       <div className="user">
-        <h2 className="title--lg user__name">{user.fullName}</h2>
-        <h5 className="text--sm user__nickname">@{user.username}</h5>
+        <h2 className="title--lg user__name">{user.displayName}</h2>
         <div className="account__actions">
           <Action
             type="email"
-            hasInput
-            doc={doc}>
+            hasInput>
             Change e-mail
           </Action>
           <Action
             type="password"
-            hasInput
-            doc={doc}>
+            hasInput>
             Change password
           </Action>
           <Action
-            type="quit">
-            Quit
+            type="logout">
+            Log out
           </Action>
         </div>
       </div>

@@ -5,12 +5,15 @@
   "homepage": "/react-todo",
   "dependencies": {
     "@craco/craco": "^7.1.0",
+    "@hello-pangea/dnd": "^17.0.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "chart.js": "^4.3.0",
+    "dayjs": "^1.11.13",
     "firebase": "^9.22.2",
     "material-symbols": "^0.7.0",
+    "nanoid": "^5.0.8",
     "node-cron": "^3.0.2",
     "normalize.css": "^8.0.1",
     "react": "^18.2.0",
@@ -30,8 +33,7 @@
     "start": "craco start",
     "build": "craco build",
     "test": "craco test",
-    "eject": "react-scripts eject",
-    "firebase-script": "node firebase/script.js"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -49,7 +51,8 @@
       "arrow-body-style": "off",
       "jsx-a11y/img-redundant-alt": "off",
       "no-throw-literal": "off",
-      "default-case": "off"
+      "default-case": "off",
+      "react-hooks/rules-of-hooks": "off"
     }
   },
   "browserslist": {

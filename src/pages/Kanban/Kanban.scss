@@ -178,6 +178,8 @@
     }
   }
 
+  &__drag { cursor: grab }
+
   &:hover &__actions {
     opacity: 1;
   }

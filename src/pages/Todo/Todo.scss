@@ -199,6 +199,7 @@
   &__drag {
     margin-right: rem(10px);
     color: var(--color-gray);
+    cursor: grab;
 
     @include sm-laptop {
       margin-right: rem(8px);
@@ -288,4 +289,10 @@
   @include sm-laptop {
     padding: rem(14px);
   }
+}
+
+.not-found {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

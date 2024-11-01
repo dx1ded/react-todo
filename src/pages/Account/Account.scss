@@ -80,16 +80,7 @@
   flex: 1;
 
   &__name {
-    margin-bottom: rem(10px);
-  }
-
-  &__nickname {
-    margin-bottom: rem(40px);
-    color: var(--color-blue);
-
-    @include tablet {
-      margin-bottom: rem(30px);
-    }
+    margin-bottom: rem(30px);
   }
 }
 

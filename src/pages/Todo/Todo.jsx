@@ -1,63 +1,91 @@
 import {useState, useEffect, useRef} from "react"
-import {DragDropContext, Droppable, Draggable} from "react-beautiful-dnd"
+import {DragDropContext, Droppable, Draggable} from "@hello-pangea/dnd"
 import {useParams, useNavigate} from "react-router-dom"
-import {v4} from "uuid"
-import {updateDoc, deleteField} from "firebase/firestore"
-import {useUser} from "@hooks/useUser"
-import {useSaveDebounced} from "@hooks/useSaveDebounced"
-import {useMetrics} from "@hooks/useMetrics"
-import {Loader} from "@components/Loader/Loader"
+import {useDebouncedCallback} from "use-debounce"
+import {nanoid} from "nanoid"
+import {
+  updateDoc,
+  deleteDoc,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+  collection
+} from "firebase/firestore"
+import {handleEnter} from "@/utils"
+import {useNotification} from "@/components/Notification/useNotification"
+import {useAuthContext} from "@/context/authContext"
+import {Loader} from "@/components/Loader/Loader"
 import {Task} from "./Task"
-import {isObjectEmpty} from "@/utils"
 import "./Todo.scss"
+
+const DEBOUNCED_SAVE_TIME = 1500
 
 export const Todo = () => {
   const { id } = useParams()
+  const { user } = useAuthContext()
   const navigate = useNavigate()
-  const [user, loading, doc] = useUser()
   const [todo, setTodo] = useState({})
-  const [saveData, contextHolder, api] = useSaveDebounced(doc.ref, `todos.${todo.id}`)
-  const [saveMetrics, updateMetricsBy, setMetrics] = useMetrics(doc.ref, "list")
+  const [todoDoc, setTodoDoc] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [api, contextHolder] = useNotification()
   const inputRef = useRef(null)
 
   useEffect(() => {
-    if (!loading && isObjectEmpty(todo)) {
-      setTodo(user.todos[id])
-      setMetrics(user.metrics.list)
-    }
-  }, [loading, todo, setTodo, setMetrics, user, id])
+    if (!id || !user.id) return
 
-  if (loading || isObjectEmpty(todo)) {
-    return <Loader />
-  }
+    async function fetchTodo() {
+      const snapshot = await getDocs(query(
+        collection(getFirestore(), "todos"),
+        where("id", "==", id),
+        where("userId", "==", user.id),
+      ))
 
-  const completedTasks = todo.tasks.reduce(
-    (acc, task) => task.done ? acc + 1 : acc, 0
-  )
+      if (!snapshot.empty) {
+        const doc = snapshot.docs[0]
 
-  const changeName = (event) => {
-    const newState = {
-      ...todo,
-      name: event.target.value,
-      date_modified: Date.now()
+        setTodoDoc(doc)
+        setTodo(doc.data())
+      }
+
+      setLoading(false)
     }
 
-    setTodo(newState)
-    saveData(newState)
+    fetchTodo()
+  }, [id, user.id])
+
+  const saveTodoDebounced = useDebouncedCallback(async () => {
+    if (!todoDoc) return
+
+    try {
+      await updateDoc(todoDoc.ref, todo)
+      api.add({
+        title: "👍 Saved",
+        text: "Your data has been saved successfully!",
+        duration: 5000
+      })
+    } catch (_) {
+      api.add({
+        title: "😔 Unknown error",
+        text: "Please, try again!",
+        duration: 5000
+      })
+    }
+  }, DEBOUNCED_SAVE_TIME)
+
+  // Saving on exit
+  useEffect(() => saveTodoDebounced.flush, [saveTodoDebounced.flush])
+
+  const changeName = (name) => {
+    setTodo((prev) => ({ ...prev, name, lastUpdated: Date.now() }))
+    saveTodoDebounced()
   }
 
   const deleteTodo = () => {
+    if (!todoDoc) return
+
     const confirm = async () => {
-      await updateDoc(doc.ref, {
-        [`todos.${id}`]: deleteField()
-      })
-
-      const tasksToDo = todo.tasks.filter((task) => !task.done).length
-
-      updateMetricsBy("To-Do", -tasksToDo)
-      updateMetricsBy("Done", -(todo.tasks.length - tasksToDo))
-
-      saveMetrics()
+      await deleteDoc(todoDoc.ref)
       navigate("/list")
     }
 
@@ -77,7 +105,9 @@ export const Todo = () => {
   }
 
   const addTask = () => {
-    if (!inputRef.current.value) {
+    const name = inputRef.current.value
+
+    if (!name) {
       return api.add({
         title: "😶 Cannot be empty!",
         text: "The name of the task cannot be empty. Please enter any letters!",
@@ -85,22 +115,19 @@ export const Todo = () => {
       })
     }
 
-    const newState = {
-      ...todo,
-      date_modified: Date.now(),
+    setTodo((prev) => ({
+      ...prev,
+      lastUpdated: Date.now(),
       tasks: [
         {
-          id: v4(),
-          name: inputRef.current.value,
+          id: nanoid(),
+          name,
           done: false
         },
-        ...todo.tasks
+        ...prev.tasks
       ]
-    }
-
-    setTodo(newState)
-    updateMetricsBy("To-Do", 1)
-    saveData(newState, saveMetrics)
+    }))
+    saveTodoDebounced()
 
     inputRef.current.value = ""
   }
@@ -115,21 +142,27 @@ export const Todo = () => {
       { index: dIndex }
     ] = [source, destination]
 
-    const filteredCol = todo.tasks.filter((_, i) => i !== sIndex)
+    const target = todo.tasks.find((_, i) => i === sIndex)
+    const updatedTasks = [...todo.tasks]
 
-    const newState = {
-      ...todo,
-      date_modified: Date.now(),
-      tasks: [
-        ...filteredCol.slice(0, dIndex),
-        todo.tasks[sIndex],
-        ...filteredCol.slice(dIndex)
-      ]
-    }
+    updatedTasks.splice(sIndex, 1)
+    updatedTasks.splice(dIndex, 0, target)
 
-    setTodo(newState)
-    saveData(newState)
+    setTodo((prev) => ({ ...prev, tasks: updatedTasks, lastUpdated: Date.now() }))
+    saveTodoDebounced()
   }
+
+  if (loading) {
+    return <Loader />
+  }
+
+  if (!loading && !todo.id) {
+    return <h2 className="title--md not-found">Not found</h2>
+  }
+
+  const completedTasks = todo.tasks.reduce(
+    (acc, task) => task.done ? acc + 1 : acc, 0
+  )
 
   return (
     <section className="todo">
@@ -139,32 +172,32 @@ export const Todo = () => {
           type="text"
           className="todo__name"
           defaultValue={todo.name}
-          onChange={changeName}
+          onChange={(e) => changeName(e.target.value)}
         />
-        <button className="btn btn-reset todo__delete" onClick={deleteTodo}>
+        <button className="btn btn-reset todo__delete" onClick={() => void deleteTodo()}>
           Delete
         </button>
       </div>
       <div className="todo__body">
         <div className="todo__add">
           <input
+            ref={inputRef}
             type="text"
             placeholder="Task name"
-            onKeyDown={(e) => e.key === "Enter" && addTask()}
-            ref={inputRef}
+            onKeyDown={handleEnter(addTask)}
           />
           <button
             className="btn btn-reset"
-            onClick={addTask}>
+            onClick={() => void addTask()}>
             Add
           </button>
         </div>
         <div className="todo__labels">
-          <h4 className="todo__label" style={{color: "var(--color-blue)"}}>
+          <h4 className="todo__label" style={{ color: "var(--color-blue)" }}>
             Total amount
             <span>{todo.tasks.length}</span>
           </h4>
-          <h4 className="todo__label" style={{color: "var(--color-purple)"}}>
+          <h4 className="todo__label" style={{ color: "var(--color-purple)" }}>
             Completed
             <span>{completedTasks} of {todo.tasks.length}</span>
           </h4>
@@ -174,18 +207,14 @@ export const Todo = () => {
             {(provided) => (
               <ul className="list-reset tasks" {...provided.droppableProps} ref={provided.innerRef}>
                 {todo.tasks.map((task, i) =>
-                  <Draggable draggableId={`task/${task.id}`} key={task.id} index={i} isDragDisabled={task.done}>
+                  <Draggable key={task.id} draggableId={task.id} index={i} isDragDisabled={task.done}>
                     {(provided) => (
                       <Task
-                        name={task.name}
-                        isDone={task.done}
-                        index={i}
-                        saveMetrics={saveMetrics}
-                        updateMetricsBy={updateMetricsBy}
+                        task={task}
                         todo={todo}
                         setTodo={setTodo}
                         provided={provided}
-                        saveData={saveData}
+                        saveTodoDebounced={saveTodoDebounced}
                       />
                     )}
                   </Draggable>

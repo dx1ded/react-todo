@@ -1,21 +1,14 @@
 import {useState} from "react"
-import {updateDoc} from "firebase/firestore"
-import {useNotification} from "@components/Notification/useNotification"
-import {Loader} from "@components/Loader/Loader"
+import {updateProfile, getAuth} from "firebase/auth"
+import {getStorage, ref, uploadBytes, getDownloadURL} from "firebase/storage"
+import {useAuthContext} from "@/context/authContext"
+import {useNotification} from "@/components/Notification/useNotification"
+import {Loader} from "@/components/Loader/Loader"
 
-function convertBase64(file) {
-  return new Promise((resolve, reject) => {
-    const fileReader = new FileReader()
-    fileReader.readAsDataURL(file)
-
-    fileReader.onload = () => resolve(fileReader.result)
-    fileReader.onerror = (error) => reject(error)
-  })
-}
-
-export const Photo = ({ user, doc }) => {
+export const Photo = ({ photoURL }) => {
   const [api, contextHolder] = useNotification()
   const [isLoading, setIsLoading] = useState(false)
+  const {setUser} = useAuthContext()
   let id
 
   const clickHandler = () => {
@@ -54,14 +47,20 @@ export const Photo = ({ user, doc }) => {
     setIsLoading(true)
 
     try {
-      const base64 = await convertBase64(file)
+      const storage = getStorage()
+      const currentUser = getAuth().currentUser
 
-      await updateDoc(doc.ref, { avatar: base64 })
+      const photoRef = ref(storage, `profilePictures/${currentUser.uid}`)
+      await uploadBytes(photoRef, file)
+
+      const photoURL = await getDownloadURL(photoRef)
+
+      await updateProfile(currentUser, { photoURL })
 
       setIsLoading(false)
-      api.remove(id)
+      setUser((prev) => ({ ...prev, photoURL }))
 
-      user.avatar = base64
+      api.remove(id)
     } catch(e) {
       console.error(e)
     }
@@ -71,7 +70,7 @@ export const Photo = ({ user, doc }) => {
     <div className="photo">
       {contextHolder}
       <div className="photo__image">
-        <img src={user.avatar} alt="Profile picture" />
+        <img src={photoURL} alt="Profile picture" />
       </div>
       <button className="btn-reset photo__change" onClick={clickHandler}>
         Change

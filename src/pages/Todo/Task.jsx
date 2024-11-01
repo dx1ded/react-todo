@@ -1,79 +1,54 @@
 import {useState, useRef} from "react"
-import {flushSync} from "react-dom"
 
-const getField = (isDone) => isDone ? "Done" : "To-Do"
-
-export const Task = ({ name, isDone, index, saveMetrics, updateMetricsBy, todo, setTodo, provided, saveData }) => {
+export const Task = ({ task, todo, setTodo, provided, saveTodoDebounced }) => {
   const [isDoneButton, setIsDoneButton] = useState(false)
   const nameRef = useRef(null)
 
   const toggleDone = () => {
-    const excludedList = todo.tasks.filter((_, i) => i !== index)
-    let toInsertIndex = excludedList.findIndex((task) => task.done)
+    const updatedTasks = todo.tasks.filter((t) => t.id !== task.id)
 
-    if (!~toInsertIndex) {
-      toInsertIndex = excludedList.length
+    if (task.done) {
+      updatedTasks.unshift({ ...task, done: false })
+    } else {
+      updatedTasks.push({ ...task, done: true })
     }
 
-    const tasks = [...excludedList]
-
-    tasks.splice(isDone ? 0 : toInsertIndex, 0, {
-      ...todo.tasks[index],
-      done: !todo.tasks[index].done,
-    })
-
-    const newState = {
-      ...todo,
-      date_modified: Date.now(),
-      tasks
-    }
-
-    setTodo(newState)
-    updateMetricsBy(getField(todo.tasks[index].done), -1)
-    updateMetricsBy(getField(!todo.tasks[index].done), 1)
-    saveData(newState, saveMetrics)
-  }
-
-  const editTask = () => {
-    flushSync(() => setIsDoneButton(true))
-
-    nameRef.current.focus()
+    setTodo((prev) => ({
+      ...prev,
+      lastUpdated: Date.now(),
+      tasks: updatedTasks
+    }))
+    saveTodoDebounced()
   }
 
   const changeTaskName = () => {
-    if (name === nameRef.current.textContent) {
+    const newName = nameRef.current.textContent
+
+    if (task.name === newName) {
       return setIsDoneButton(false)
     }
 
-    const newState = {
-      ...todo,
-      date_modified: Date.now(),
-      tasks: todo.tasks.map((task, i) => i === index
-        ? { ...todo.tasks[i], name: nameRef.current.textContent }
-        : task
-      )
-    }
-
-    setTodo(newState)
-    saveData(newState)
+    setTodo((prev) => ({
+      ...prev,
+      lastUpdated: Date.now(),
+      tasks: prev.tasks.map((t) => t.id === task.id ? { ...t, name: newName } : t)
+    }))
+    saveTodoDebounced()
     setIsDoneButton(false)
   }
 
   const deleteTask = () => {
-    const newState = {
-      ...todo,
-      date_modified: Date.now(),
-      tasks: todo.tasks.filter((_, i) => i !== index)
-    }
-
-    setTodo(newState)
-    updateMetricsBy(getField(todo.tasks[index].done), -1)
-    saveData(newState, saveMetrics)
+    setTodo((prev) => ({
+      ...prev,
+      lastUpdated: Date.now(),
+      tasks: prev.tasks.filter((t) => t.id !== task.id)
+    }))
+    saveTodoDebounced()
   }
 
   return (
     <li
-      className={`task ${isDone ? "task--done" : ""}`}
+      className={`task ${task.done ? "task--done" : ""}`}
       ref={provided.innerRef}
       {...provided.draggableProps}
     >
@@ -86,11 +61,11 @@ export const Task = ({ name, isDone, index, saveMetrics, updateMetricsBy, todo, 
         <button
           className="btn btn-reset task__done"
           aria-label="Mark as done"
-          onClick={toggleDone}
+          onClick={() => void toggleDone()}
           disabled={isDoneButton}
         >
           <span className="material-symbols-outlined">
-            {isDone ? "check_circle" : "radio_button_unchecked"}
+            {task.done ? "check_circle" : "radio_button_unchecked"}
           </span>
         </button>
         <h5
@@ -98,20 +73,20 @@ export const Task = ({ name, isDone, index, saveMetrics, updateMetricsBy, todo, 
           contentEditable={isDoneButton}
           suppressContentEditableWarning
           ref={nameRef}>
-          {name}
+          {task.name}
         </h5>
       </div>
       <div className="task__right">
         {isDoneButton
-          ? <button className="btn btn-reset task__edit-done" aria-label="Change task name" onClick={changeTaskName}>
+          ? <button className="btn btn-reset task__edit-done" aria-label="Change task name" onClick={() => void changeTaskName()}>
               <span className="material-symbols-outlined">done</span>
             </button>
           : (
             <>
-              <button className="btn btn-reset task__edit" aria-label="Edit task" onClick={editTask}>
+              <button className="btn btn-reset task__edit" aria-label="Edit task" onClick={() => setIsDoneButton(true)}>
                 <span className="material-symbols-outlined">edit_note</span>
               </button>
-              <button className="btn btn-reset task__delete" aria-label="Delete task" onClick={deleteTask}>
+              <button className="btn btn-reset task__delete" aria-label="Delete task" onClick={() => void deleteTask()}>
                 <span className="material-symbols-outlined">delete</span>
               </button>
             </>

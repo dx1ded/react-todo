@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -8,10 +9,21 @@ import {
   Tooltip,
   Legend
 } from "chart.js"
+import {
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+  collection
+} from "firebase/firestore"
+import {useEffect, useState} from "react"
 import {Bar, Pie} from "react-chartjs-2"
+import {useAuthContext} from "@/context/authContext"
+import {Loader} from "@/components/Loader/Loader"
+import {getDefaultKanbanData} from "@/utils"
 import {createOptions, createBarData, createPieData} from "./Chart.functions"
-import {useUser} from "@hooks/useUser"
-import {Loader} from "@components/Loader/Loader"
 import "./Dashboard.scss"
 
 ChartJS.register(
@@ -34,18 +46,75 @@ const Info = ({ type, children }) => {
 }
 
 export const Dashboard = () => {
-  const [user, loading] = useUser()
+  const { user } = useAuthContext()
+  const [kanbanData, setKanbanData] = useState(getDefaultKanbanData())
+  const [todoData, setTodoData] = useState({ Todo: 0, Done: 0 })
+  const [isLoading, setIsLoading] = useState(true)
 
-  if (loading) {
+  useEffect(() => {
+    if (!user.id) return
+
+    const db = getFirestore()
+
+    async function fetchData() {
+      const kanbanDoc = await getDoc(doc(db, "kanban", user.id))
+
+      if (kanbanDoc.exists()) {
+        const state = getDefaultKanbanData()
+        const kanban = kanbanDoc.data()
+
+        const fourMonthsAgo = dayjs().subtract(4, "months").valueOf()
+
+        const updateStats = (tasks, statusKey) => {
+          tasks
+            .filter((t) => t.createdAt > fourMonthsAgo)
+            .forEach((t) => {
+              const monthKey = dayjs(t.createdAt).format("MMM")
+              const monthIndex = state.findIndex((item) => item.name === monthKey)
+
+              if (monthIndex !== -1) {
+                state[monthIndex].stats[statusKey] += 1
+              }
+            })
+        }
+
+        updateStats(kanban.todo, "todo")
+        updateStats(kanban.inProgress, "inProgress")
+        updateStats(kanban.done, "done")
+
+        setKanbanData(state)
+      }
+
+      const todos = await getDocs(query(
+        collection(db, "todos"),
+        where("userId", "==", user.id),
+        where("lastUpdated", ">", dayjs().startOf("month").valueOf())
+      ))
+
+      if (!todos.empty) {
+        const state = { Todo: 0, Done: 0 }
+
+        todos.forEach((doc) => {
+          const todo = doc.data()
+
+          state.Todo += todo.tasks.filter((t) => !t.done).length
+          state.Done += todo.tasks.filter((t) => t.done).length
+        })
+
+        setTodoData(state)
+      }
+
+      setIsLoading(false)
+    }
+
+    fetchData()
+  }, [user.id])
+
+  if (isLoading) {
     return <Loader />
   }
 
-  const firstName = user.fullName.split(" ")[0]
-
-  const columns = {
-    kanban: ["To-Do", "In progress", "Done"],
-    list: ["To-Do", "Done"]
-  }
+  const firstName = user.displayName.split(" ")[0]
 
   return (
     <section className="dashboard">
@@ -57,51 +126,31 @@ export const Dashboard = () => {
         <div>
           <Bar
             options={createOptions("Kanban total")}
-            data={createBarData(
-              columns.kanban
-              .map((label) => ({
-                label,
-                data: user.metrics.kanban.map((period) => period[label])
-              })
-             ))}
-          />
-        </div>
-        <div>
-          <Pie
-            data={createPieData(
-              columns.kanban,
-              [{
-                label: "# of",
-                data: columns.kanban.map((column) =>
-                  user.metrics.kanban.at(-1)[column]
-                )
-              }]
-            )}
+            data={createBarData([
+              {
+                label: "To-Do",
+                data: kanbanData.map((item) => item.stats.todo)
+              },
+              {
+                label: "In Progress",
+                data: kanbanData.map((item) => item.stats.inProgress)
+              },
+              {
+                label: "Done",
+                data: kanbanData.map((item) => item.stats.done)
+              }
+            ])}
           />
         </div>
       </Info>
       <Info type="List">
         <div>
-          <Bar
-            options={createOptions("List total")}
-            data={createBarData(
-              columns.list
-              .map((label) => ({
-                  label,
-                  data: user.metrics.list.map((period) => period[label])
-                })
-              ))}
-          />
-        </div>
-        <div>
           <Pie
             data={createPieData(
-              columns.list,
+              Object.keys(todoData),
               [{
                 label: "# of",
-                data: columns.list.map((column) =>
-                  user.metrics.list.at(-1)[column]
-                )
+                data: Object.entries(todoData).map(([label, value]) => ({ label, value }))
               }]
             )}
           />

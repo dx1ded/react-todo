@@ -1,4 +1,4 @@
-import {getLastMonths} from "@/utils"
+import {getLastFourMonths} from "@/utils"
 
 export function createOptions(text) {
   return {
@@ -20,7 +20,7 @@ export function createBarData(datasets) {
   const COLORS = ["#4EA8DE", "#5E60CE", "#F2F2F2"]
 
   return {
-    labels: getLastMonths(4).reverse(),
+    labels: getLastFourMonths(),
     datasets: datasets.map((dataset, i) => ({
       ...dataset,
       backgroundColor: COLORS[i]
@@ -29,7 +29,7 @@ export function createBarData(datasets) {
 }
 
 export function createPieData(labels, datasets) {
-  const COLORS = ["#CB7777", "#77C0CB", "#7CCB77"]
+  const COLORS = ["#CB7777", "#77C0CB"]
 
   return {
     labels,

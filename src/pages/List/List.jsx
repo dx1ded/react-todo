@@ -1,51 +1,66 @@
-import {useState} from "react"
+import {useEffect, useState} from "react"
 import {NavLink} from "react-router-dom"
-import {v4} from "uuid"
-import {updateDoc} from "firebase/firestore"
-import {useUser} from "@hooks/useUser"
-import {Loader} from "@components/Loader/Loader"
-import {isObjectEmpty} from "@/utils"
+import {nanoid} from "nanoid"
+import dayjs from "dayjs"
+import {
+  doc,
+  setDoc,
+  getDocs,
+  query,
+  getFirestore,
+  collection,
+  where
+} from "firebase/firestore"
+import {Loader} from "@/components/Loader/Loader"
+import {useAuthContext} from "@/context/authContext"
 import "./List.scss"
 
-const ListItem = ({ item }) => {
-  const dateString = new Date(item.date_modified).toLocaleString("en-US", {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric"
-  })
-
-  return (
-    <NavLink to={`/list/${item.id}`} className="list-item">
-      <span className="list-item__name">{item.name}</span>
-      <time className="list-item__date">{dateString}</time>
-    </NavLink>
-  )
-}
-
 export const List = () => {
-  const [todos, setTodos] = useState({})
-  const [user, loading, doc] = useUser()
+  const { user } = useAuthContext()
+  const [loading, setLoading] = useState(true)
+  const [todos, setTodos] = useState([])
 
-  const addList = async () => {
-    const id = v4()
+  useEffect(() => {
+    if (!user.id) return
 
-    const newState = {
-      ...user.todos,
-      [id]: {
-        id,
-        name: "New List",
-        date_modified: Date.now(),
-        tasks: []
+    async function fetchTodos() {
+      const snapshot = await getDocs(query(
+        collection(getFirestore(), "todos"),
+        where("userId", "==", user.id)
+      ))
+
+      if (!snapshot.empty) {
+        const state = []
+
+        snapshot.forEach((doc) => {
+          state.push(doc.data())
+        })
+
+        setTodos(state)
       }
+
+      setLoading(false)
     }
 
-    setTodos(newState)
-    await updateDoc(doc.ref, { "todos": newState })
+    fetchTodos()
+  }, [user.id])
+
+  const addList = async () => {
+    const id = nanoid()
+
+    const newList = {
+      id,
+      userId: user.id,
+      name: "New List",
+      lastUpdated: Date.now(),
+      tasks: []
+    }
+
+    setTodos((prev) => [newList, ...prev])
+    await setDoc(doc(getFirestore(), "todos", id), newList)
   }
 
-  if (loading) {
-    return <Loader />
-  }
+  if (loading) return <Loader />
 
   return (
     <section className="list">
@@ -56,13 +71,22 @@ export const List = () => {
           <h4 className="list__label">Date modified</h4>
         </div>
         <div className="list__items">
-          {Object.values(isObjectEmpty(todos) ? user.todos : todos)
-            .sort((a, b) => b.date_modified - a.date_modified)
+          {todos
+            .sort((a, b) => b.lastUpdated - a.lastUpdated)
             .map((item) => <ListItem key={item.id} item={item} />)
           }
           <button className="btn btn-reset list__add" onClick={addList}>Add list</button>
         </div>
       </div>
     </section>
+  )
+}
+
+const ListItem = ({ item }) => {
+  return (
+    <NavLink to={`/list/${item.id}`} className="list-item">
+      <span className="list-item__name">{item.name}</span>
+      <time className="list-item__date">{dayjs(item.lastUpdated).format("M/D/YYYY")}</time>
+    </NavLink>
   )
 }

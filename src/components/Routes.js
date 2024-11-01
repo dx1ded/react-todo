@@ -1,23 +1,25 @@
 import {Outlet, Navigate, useLocation} from "react-router-dom"
-import {useAuth} from "@hooks/useAuth"
-import {Loader} from "@components/Loader/Loader"
+import {Loader} from "@/components/Loader/Loader"
+import {useAuthContext} from "@/context/authContext"
 
 export const PrivateRoutes = () => {
-  const [user, loading] = useAuth()
+  const { user, isLoading } = useAuthContext()
 
-  if (loading) return <Loader />
+  if (isLoading) return <Loader />
 
-  return user
+  return user.id
     ? <Outlet />
     : <Navigate to="/auth" />
 }
 
 
 export const PublicRoutes = () => {
-  const [user] = useAuth()
+  const { user, isLoading } = useAuthContext()
   const location = useLocation()
 
-  return user && location.pathname === "/auth"
+  if (isLoading) return <Loader />
+
+  return user.id && location.pathname === "/auth"
     ? <Navigate to="/" />
     : <Outlet />
 }

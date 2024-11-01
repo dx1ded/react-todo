@@ -1,15 +1,15 @@
-import {useState, useContext, useRef} from "react"
+import {useState, useRef} from "react"
 import {
   signOut,
   updateEmail,
   updatePassword,
   reauthenticateWithCredential,
-  EmailAuthProvider
+  getAuth,
+  updateProfile,
+  EmailAuthProvider,
 } from "firebase/auth"
-import {updateDoc} from "firebase/firestore"
-import {FirebaseContext} from "@/context/firebaseContext"
-import {getUserDoc} from "@/getUserDoc"
-import {useNotification} from "@components/Notification/useNotification"
+import {useAuthContext} from "@/context/authContext"
+import {useNotification} from "@/components/Notification/useNotification"
 
 const getErrorObject = (validity, type) => {
   let obj = {}
@@ -32,21 +32,23 @@ const getErrorObject = (validity, type) => {
 export const Action = ({ type, hasInput, doc, children }) => {
   const [api, contextHandler] = useNotification()
   const [isActive, setIsActive] = useState(false)
-  const {auth, db} = useContext(FirebaseContext)
+  const {user} = useAuthContext()
   const inputRef = useRef(null)
 
   const buttonTypes = {
     email: "primary",
     password: "secondary",
-    quit: "danger"
+    logout: "danger"
   }
 
   const clickHandler = async (event) => {
     const input = inputRef.current
     const dataName = event.target.dataset.type
-    const oldEmail = auth.currentUser.email
+    const oldEmail = user.email
 
-    if (dataName === "quit") return signOut(auth)
+    const auth = getAuth()
+
+    if (dataName === "logout") return signOut(auth)
     else if (!isActive) return setIsActive(true)
 
     // Input validation
@@ -66,67 +68,55 @@ export const Action = ({ type, hasInput, doc, children }) => {
       duration: 5000
     })
 
-    // Check if there's a user with that email already
-
-    const emailIsAlreadyUsed = await getUserDoc(db, input.value)
-
-    if (emailIsAlreadyUsed) return api.add({
-      title: "👽 Already used!",
-      text: "The e-mail you try to change on is already used. Please use another one!",
-      duration: 5000
-    })
-
-    // Change email
-
     const fn = dataName === "email"
       ? updateEmail
       : updatePassword
 
-    await changeEmail()
+    await callAction()
 
-    async function changeEmail() {
-      await fn(auth.currentUser, input.value)
-        .then(async () => {
-          // Update user's firestore object since it has changed
-          if (dataName === "email") {
-            await updateDoc(doc.ref, { email: input.value })
+    async function callAction() {
+      try {
+        await fn(auth.currentUser, input.value)
+
+        // Update user's firestore object since it has changed
+        if (dataName === "email") {
+          await updateProfile(auth.currentUser, { email: input.value })
+        }
+
+        setIsActive(!isActive)
+
+        api.add({ title: `✅ Your ${type} has been updated!` })
+        input.value = ""
+      } catch (error) {
+        if (error.code === "auth/requires-recent-login") {
+          const inputNotif = api.add({
+            title: "🙄 Verification",
+            text: "Enter your password again to the input below",
+            duration: 999999,
+            children: (
+              <form className="notification__container" onSubmit={handleSubmit}>
+                <input type="password" name="password" className="notification__input" />
+                <input type="submit" className="notification__button" />
+              </form>
+            )
+          })
+
+          async function handleSubmit(event) {
+            event.preventDefault()
+            api.remove(inputNotif)
+
+            const password = new FormData(event.target).get("password")
+            const credential = EmailAuthProvider.credential(oldEmail, password)
+
+            reauthenticateWithCredential(auth.currentUser, credential)
+              .then(callAction)
+              .catch(() => api.add({
+                title: "⛔️ Wrong password",
+                text: "The password you have enter is wrong. Try again!"
+              }))
           }
-
-          api.add({ title: `✅ Your ${type} has been updated!` })
-
-          setIsActive(!isActive)
-          input.value = ""
-        })
-        .catch((error) => {
-          if (error.code === "auth/requires-recent-login") {
-            const inputNotif = api.add({
-              title: "🙄 Verification",
-              text: "Enter your password again to the input below",
-              duration: 999999,
-              children: (
-                <form className="notification__container" onSubmit={handleSubmit}>
-                  <input type="password" name="password" className="notification__input" />
-                  <input type="submit" className="notification__button" />
-                </form>
-              )
-            })
-
-            async function handleSubmit(event) {
-              event.preventDefault()
-              api.remove(inputNotif)
-
-              const password = new FormData(event.target).get("password")
-              const credential = EmailAuthProvider.credential(oldEmail, password)
-
-              reauthenticateWithCredential(auth.currentUser, credential)
-                .then(changeEmail)
-                .catch(() => api.add({
-                  title: "⛔️ Wrong password",
-                  text: "The password you have enter is wrong. Try again!"
-                }))
-            }
-          }
-        })
+        }
+      }
     }
   }
 

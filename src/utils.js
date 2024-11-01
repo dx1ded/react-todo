@@ -1,27 +1,18 @@
-// amount<max> -> 12
-export const getLastMonths = (amount) => {
-  const currentMonth = new Date().getMonth()
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
-  ]
+import dayjs from "dayjs"
 
-  return Array(amount)
-    .fill(null)
-    .reduce((acc, _, i) =>
-      (acc.push(months.at(currentMonth - i)), acc),
-      []
-    )
+export const getLastFourMonths = () => {
+  const monthNames = []
+
+  for (let i = 0; i < 4; i++) {
+    monthNames.push(dayjs().subtract(i, 'months').format('MMM'))
+  }
+
+  // Since the current month will be the first item
+  return monthNames.toReversed()
+}
+
+export const getDefaultKanbanData = () => {
+  return getLastFourMonths().map((month) => ({ name: month, stats: { todo: 0, inProgress: 0, done: 0 } }))
 }
 
 export const isActivePath = (itemPath, currentPath) => {
@@ -29,6 +20,12 @@ export const isActivePath = (itemPath, currentPath) => {
     || (itemPath === "/list" && currentPath.startsWith("/list"))
 }
 
-export const isObjectEmpty = (object) => {
-  return Object.keys(object).length === 0
+export const handleEnter = (cb) => {
+  return (event) => {
+    if (event.key === "Enter") {
+      cb()
+    }
+  }
 }
+
+export const defaultPhotoURL = "https://firebasestorage.googleapis.com/v0/b/react-todo-eab1e.appspot.com/o/frlIf.png?alt=media&token=6434c571-c0dd-4f84-bc68-2f11a3d197ad"
