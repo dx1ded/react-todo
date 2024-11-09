@@ -19,5 +19,5 @@ RUN npm install -g serve
 # As it's a new node image we need to copy the build result from the other node image (the one that was used for building)
 COPY --from=builder /app/build /app/build
 
-EXPOSE 3000
-CMD ["serve", "-s", "build"]
+EXPOSE 80
+CMD ["serve", "-s", "build", "-l", "80"]
