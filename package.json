@@ -2,7 +2,6 @@
   "name": "react-todo",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/react-todo",
   "dependencies": {
     "@craco/craco": "^7.1.0",
     "@hello-pangea/dnd": "^17.0.0",

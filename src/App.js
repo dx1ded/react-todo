@@ -19,7 +19,7 @@ const Layout = () => (
 export const App = () => {
   return (
     <div className="container app">
-      <BrowserRouter basename={process.env.REACT_APP_BASE_URL}>
+      <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
             {/* Private Routes */}
