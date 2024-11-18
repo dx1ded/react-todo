@@ -7,13 +7,13 @@ import {AuthProvider} from "@/context/authContext"
 import {App} from "./App"
 
 initializeApp({
-  apiKey: "AIzaSyBFQnx80j5XA2_noPvqThgtvCce3unQkdI",
-  authDomain: "react-todo-eab1e.firebaseapp.com",
-  projectId: "react-todo-eab1e",
-  storageBucket: "react-todo-eab1e.appspot.com",
-  messagingSenderId: "159401738701",
-  appId: "1:159401738701:web:fb871c17c2cf404d40c484",
-  measurementId: "G-K9EZ8RD945"
+  apiKey: process.env.REACT_APP_FB_API_KEY,
+  authDomain: process.env.REACT_APP_FB_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FB_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FB_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FB_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FB_APP_ID,
+  measurementId: process.env.REACT_APP_FB_MEASUREMENT_ID
 })
 
 ReactDOM.createRoot(document.getElementById('root'))
