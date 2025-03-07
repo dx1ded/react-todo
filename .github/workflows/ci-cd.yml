@@ -47,4 +47,5 @@ jobs:
             cd ./www
             export REACT_TODO_IMAGE=${{ secrets.DOCKERHUB_REPO }}:latest
             docker rmi $REACT_TODO_IMAGE
+            docker compose down react-todo
             docker compose up traefik react-todo -d --no-recreate
