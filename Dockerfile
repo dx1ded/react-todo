@@ -22,6 +22,9 @@ WORKDIR /usr/share/nginx/html
 
 COPY --from=builder /app/build .
 
+# Copy the custom nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 RUN addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup && \
     chown -R appuser:appgroup /usr/share/nginx/html && \

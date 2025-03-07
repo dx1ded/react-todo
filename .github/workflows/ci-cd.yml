@@ -22,7 +22,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          platforms: linux/amd64,linux/arm64
           tags: ${{ secrets.DOCKERHUB_REPO }}:latest
           build-args: |
             REACT_APP_FB_API_KEY=${{ secrets.REACT_APP_FB_API_KEY }}
@@ -47,6 +46,6 @@ jobs:
           script: |
             cd ./www
             export REACT_TODO_IMAGE=${{ secrets.DOCKERHUB_REPO }}:latest
-            docker rmi $REACT_TODO_IMAGE
             docker compose down react-todo
+            docker rmi ${{ secrets.DOCKERHUB_REPO }}:latest
             docker compose up traefik react-todo -d --no-recreate
