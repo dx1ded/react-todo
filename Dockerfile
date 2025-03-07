@@ -21,7 +21,7 @@ RUN --mount=type=secret,id=REACT_APP_FB_API_KEY \
   REACT_APP_FB_MESSAGING_SENDER_ID=$(cat /run/secrets/REACT_APP_FB_MESSAGING_SENDER_ID) && \
   REACT_APP_FB_APP_ID=$(cat /run/secrets/REACT_APP_FB_APP_ID) && \
   REACT_APP_FB_MEASUREMENT_ID=$(cat /run/secrets/REACT_APP_FB_MEASUREMENT_ID) && \
-  echo $REACT_APP_FB_STORAGE_BUCKET \
+  echo $REACT_APP_FB_STORAGE_BUCKET && \
   npm run build
 
 # Serving image
