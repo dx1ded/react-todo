@@ -6,30 +6,10 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 
-ARG REACT_APP_FB_API_KEY
-ARG REACT_APP_FB_AUTH_DOMAIN
-ARG REACT_APP_FB_PROJECT_ID
-ARG REACT_APP_FB_STORAGE_BUCKET
-ARG REACT_APP_FB_MESSAGING_SENDER_ID
-ARG REACT_APP_FB_APP_ID
-ARG REACT_APP_FB_MEASUREMENT_ID
-
-# genenv + build
-RUN --mount=type=secret,id=REACT_APP_FB_API_KEY \
-  --mount=type=secret,id=REACT_APP_FB_AUTH_DOMAIN \
-  --mount=type=secret,id=REACT_APP_FB_PROJECT_ID \
-  --mount=type=secret,id=REACT_APP_FB_STORAGE_BUCKET \
-  --mount=type=secret,id=REACT_APP_FB_MESSAGING_SENDER_ID \
-  --mount=type=secret,id=REACT_APP_FB_APP_ID \
-  --mount=type=secret,id=REACT_APP_FB_MEASUREMENT_ID \
-  REACT_APP_FB_API_KEY=$(cat /run/secrets/REACT_APP_FB_API_KEY) && \
-  REACT_APP_FB_AUTH_DOMAIN=$(cat /run/secrets/REACT_APP_FB_AUTH_DOMAIN) && \
-  REACT_APP_FB_PROJECT_ID=$(cat /run/secrets/REACT_APP_FB_PROJECT_ID) && \
-  REACT_APP_FB_STORAGE_BUCKET=$(cat /run/secrets/REACT_APP_FB_STORAGE_BUCKET) && \
-  REACT_APP_FB_MESSAGING_SENDER_ID=$(cat /run/secrets/REACT_APP_FB_MESSAGING_SENDER_ID) && \
-  REACT_APP_FB_APP_ID=$(cat /run/secrets/REACT_APP_FB_APP_ID) && \
-  REACT_APP_FB_MEASUREMENT_ID=$(cat /run/secrets/REACT_APP_FB_MEASUREMENT_ID) && \
-  npm run build
+# mount secrets + build
+RUN --mount=type=secret,id=env_file,dst=/app/.env.secret \
+    cp /app/.env.secret /app/.env && \
+    npm run build
 
 # Serving image
 FROM nginx:stable-alpine AS serve
