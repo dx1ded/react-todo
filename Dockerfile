@@ -9,13 +9,20 @@ COPY . .
 RUN npm run build
 
 # Serving image
-FROM node:22-alpine
-WORKDIR /app
+FROM nginx:stable-alpine AS serve
+WORKDIR /usr/share/nginx/html
 
-RUN npm install -g serve
+COPY --from=builder /app/build .
 
-# As it's a new node image we need to copy the build result from the other node image (the one that was used for building)
-COPY --from=builder /app/build /app/build
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -u 1001 -S appuser -G appgroup && \
+    chown -R appuser:appgroup /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html && \
+    chown -R appuser:appgroup /var/cache/nginx && \
+    chown -R appuser:appgroup /var/log/nginx && \
+    touch /var/run/nginx.pid && \
+    chown -R appuser:appgroup /var/run/nginx.pid
 
+USER appuser
 EXPOSE 80
-CMD ["serve", "-s", "build", "-l", "80"]
+CMD ["nginx", "-g", "daemon off;"]
