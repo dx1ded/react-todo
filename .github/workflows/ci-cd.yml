@@ -22,6 +22,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: ${{ secrets.DOCKERHUB_REPO }}:latest
           build-args: |
             REACT_APP_FB_API_KEY=${{ secrets.REACT_APP_FB_API_KEY }}
