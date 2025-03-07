@@ -23,7 +23,7 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKERHUB_REPO }}:latest
-          secret-envs: |
+          secrets: |
             "REACT_APP_FB_API_KEY=${{ secrets.REACT_APP_FB_API_KEY }}"
             "REACT_APP_FB_AUTH_DOMAIN=${{ secrets.REACT_APP_FB_AUTH_DOMAIN }}"
             "REACT_APP_FB_PROJECT_ID=${{ secrets.REACT_APP_FB_PROJECT_ID }}"
