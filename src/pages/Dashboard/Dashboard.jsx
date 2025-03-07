@@ -119,7 +119,7 @@ export const Dashboard = () => {
   return (
     <section className="dashboard">
       <div className="greeting">
-        <h2 className="title--xl greeting__name">Hello, {firstName}! 🎉</h2>
+        <h2 className="title--xl greeting__name">Hello, {firstName}!!!! 🎉</h2>
         <p className="greeting__text">Here's what's happening in your Account</p>
       </div>
       <Info type="Kanban">
